@@ -1,0 +1,20 @@
+#phone {
+    #titlebar {
+        width:inherit;
+        height:20px;
+        background-color:black;
+        display:flex;
+        color:white;
+        .titlesection:last {
+            text-align:right;
+        }
+        .titlesection {
+            flex:1;
+            -webkit-flex:1;
+            .titleicon {
+                padding-left:2px;
+                padding-right:2px;
+            }
+        }
+    }
+}

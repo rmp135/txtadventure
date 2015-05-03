@@ -1,0 +1,17 @@
+div#navbar
+  div.navsection
+    a(ui-sref='messageslist')
+      i.fa.fa-arrow-left
+  div.navsection.aligncenter
+    span {{conversation.to}}
+  div.navsection.alignright
+div#conversationlist.scrollable
+  ul
+    li
+      input(type="text" ng-hide="conversation.to")
+    li(ng-repeat="c in conversation")
+      div.message(message="c"){{c.message}}
+div#messageentry
+  input#msgbox(type="text" ng-model="newmessage")
+  div#sendmsgbtn(ng-click="sendmsg(newmessage)")
+    i.fa.fa-send-o

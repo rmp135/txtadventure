@@ -1,0 +1,37 @@
+mixin style(name)
+  link(rel='stylesheet', href=name)
+mixin script(url)
+  script(src=url)
+
+doctype html
+html
+  head
+    title TxtAdventure
+    +style('/css/style.css')
+    +style('//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css')
+    +script('//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js')
+    +style('https://fonts.googleapis.com/css?family=Open+Sans')
+    +script('https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js')
+    +script('//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.8.0/lodash.min.js')
+    +script('https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0-rc.1/angular.js')
+    +script('https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0-rc.1/angular-animate.js')
+    +script('https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0-rc.1/angular-resource.js')
+    +script('https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.14/angular-ui-router.min.js')
+    +script('/js/app.js')
+  body(ng-app="app" ng-controller="DeviceController")
+    div#phone
+      div#titlebar
+        div.titlesection
+          i.fa.fa-wifi.titleicon
+        div.titlesection
+          #time.titleicon.aligncenter -- : --
+        div.titlesection.alignright
+          span.titleicon 100%
+          i.fa.fa-plug.titleicon
+      div#mainscreen(ui-view)
+        block content
+      
+      div#homebtn
+        a(ui-sref="springboard")
+          svg(height="42" width="42")
+            circle(cx="21" cy="21" r = "20" stroke="darkgrey" stroke-width="2" fill="rgb(40,40,40)")

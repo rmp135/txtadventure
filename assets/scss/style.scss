@@ -1,0 +1,59 @@
+@import 'phoneview';
+@import 'navbar';
+@import 'titlebar';
+@import 'contacts';
+@import 'springboard';
+@import 'messageslist';
+@import 'messagedetail';
+@import 'login';
+
+a {
+    color:black;
+    text-decoration:none;
+}
+body {
+    font-family:'Open Sans', sans-serif;
+    ul {
+        margin:0px;
+        padding:0px;
+        li {
+            list-style-type:none;
+        }
+    }
+}
+.alignright {
+    padding-right:5px;
+    text-align:right;
+}
+.aligncenter {
+    text-align:center;
+}
+.scrollable {
+    overflow-y: auto;
+}
+#phone {
+    width:300px;
+    height:600px;
+    border-color:black;
+    border-width:40px 30px 90px 30px;
+    border-style: solid;
+    border-radius:35px;
+    margin-right:auto;
+    margin-left:auto;
+    #mainscreen {
+        
+        width: inherit;
+        height:580px;
+        #content {
+            height:530px;
+        }
+    }
+    #homebtn {
+        svg {
+            padding-top:20px;
+        }
+        height:5rem;
+        text-align:center;
+    }
+}
+

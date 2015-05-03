@@ -1,0 +1,13 @@
+#messageslist {
+    ul {
+        li {
+            user-select:none;
+            cursor:pointer;
+            padding: 20px 0px 20px 20px;
+            border-bottom: 1px darkgrey solid;
+            i {
+                float:right;
+            }
+        }
+    }
+}

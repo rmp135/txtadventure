@@ -1,0 +1,29 @@
+#springboard {
+    padding-top:20px;
+    text-align:center;
+    height:560px;
+    background:url('/images/bg.jpg');
+    ul {
+        
+        li {
+            box-shadow:rgba(0, 0, 0, 0.15) 0px 6px 10px;
+            display:inline-block;
+            width:70px;
+            text-align:center;
+            // border: black 1px solid;
+            margin:10px;
+            background:linear-gradient(rgb(244, 244, 244),rgb(177, 218, 231));
+            border-radius:10px;
+            cursor:pointer;
+            user-select:none;
+            i {
+                line-height:60px;
+                font-size:40px;
+            }
+            span {
+                display:block;
+                font-size:13px;
+            }
+        }
+    }
+}

@@ -1,0 +1,49 @@
+#conversationlist {
+    width:inherit;
+    height:500px;
+    ul {
+        li {
+            padding: 0.5rem;
+            input {
+                width: 100%;
+            }
+        }
+    }
+    .message {
+        width:10rem;
+        margin: 5px 0px 5px 0px;
+        padding:7px;
+        border-radius:0.6rem;
+        box-shadow:rgba(0, 0, 0, 0.54) 0px 2px 3px;
+    }
+    .message-left {
+        background-color:darkgrey;
+        color:black;
+        float:left;
+    }
+    .message-right {
+        background-color: green;
+        color:white;
+        float:right;
+    }
+}
+#messageentry {
+    padding-top:0.3rem;
+    input {
+        float:left;
+        width:12rem;
+        margin-left:1rem;
+        
+    }
+}
+#sendmsgbtn {
+    user-select:none;
+    cursor:pointer;
+    background-color:red;
+    float:right;
+    margin-right:1rem;
+    height:1.3rem;
+    width:3rem;
+    text-align:center;
+    color:white;
+}

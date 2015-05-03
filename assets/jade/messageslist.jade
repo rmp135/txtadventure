@@ -1,0 +1,15 @@
+div#navbar
+  div.navsection
+    a(ui-sref='springboard')
+      i.fa.fa-arrow-left
+  div.navsection.aligncenter
+    span Messages
+  div.navsection.alignright
+    a(ui-sref='newmessagedetail')
+      i.fa.fa-plus
+div#content.scrollable
+  div#messageslist
+    ul
+      a(ng-repeat="c in conversations" ui-sref="messagedetail({id:c.Conversation.id})")
+          li{{c.Conversation.message}}
+            i.fa.fa-arrow-right.alignright

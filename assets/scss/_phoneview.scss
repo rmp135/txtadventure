@@ -1,0 +1,44 @@
+#content {
+    #output {
+        height:70px;
+        background:linear-gradient(rgb(161, 184, 255), rgb(199, 199, 255));
+        line-height:70px;
+        display:flex;
+        #padding {
+            flex:1;
+        }
+        #numberoutput {
+            flex:3;
+            text-align:center;
+        }
+        #backbtn {
+            float:right;
+            flex:1;
+            i:hover {
+                cursor:pointer;
+            }
+        }
+    }
+    #numbergrid {
+        padding-top:100px;
+        .row {
+            display:flex;
+            i:hover {
+                color:white;
+                background-color:green;
+            }
+            *:hover {
+                color:white;
+                background-color:red;
+            }
+            * {
+                flex:1;
+                text-align:center;
+                height:50px;
+                line-height:50px;
+                cursor:pointer;
+                user-select:none;
+            }
+        }
+    }
+}

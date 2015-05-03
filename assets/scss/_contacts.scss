@@ -1,0 +1,12 @@
+#contactslist {
+    ul {
+        li:first-child {
+            border-top:none;
+        }
+        li {
+            padding: 25px 0px 25px 20px;
+            border-top:grey 1px solid;
+            cursor:pointer;
+        }
+    }
+}
