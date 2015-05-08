@@ -38,7 +38,7 @@ exports.messages =
 
   getConversationBetweenUsers: (user1, user2) ->
     return new Promise (resolve, reject) ->
-      Promise.join (context.models.User.find where:id:user2), (selectFromView 'getConversationDetails', "WHERE `From.id` IN(#{user1},#{user2}) AND `To.id` IN(#{user1},#{user2});")
+      Promise.join (context.models.User.find where:id:user2), (selectFromView 'getConversationDetails', "WHERE `From.id` IN(#{user1},#{user2}) AND `To.id` IN(#{user1},#{user2}) ORDER BY id ASC;")
       .then (results) ->
         u = results[0]
         messages = results[1][0]

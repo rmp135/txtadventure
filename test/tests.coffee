@@ -73,7 +73,7 @@ describe.only 'messageService', ->
     message:String
     To:ContactSchema
     )
-    
+  
   it 'should display conversations for a user', (done) ->
     sqlService.messages.getConversationsForUser 1
     .then (conversations) ->
@@ -85,6 +85,15 @@ describe.only 'messageService', ->
       .then (conversations) ->
         ConversationSchema.errors(conversations).should.be.false
         done()
+
+  it 'should receieve messages in ascending order', (done) ->
+    sqlService.messages.addMessageBetweenUsers 1, 2, 'test message'
+    .then ->
+      sqlService.messages.getConversationBetweenUsers 1, 2
+      .then (messages) ->
+        messages[messages.length-1].message.should.equal 'test message'
+        done()
+
   it 'should send a message between users', (done) ->
     sqlService.messages.addMessageBetweenUsers 1,5, 'test message'
     .then ->

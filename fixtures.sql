@@ -10,4 +10,4 @@ CREATE VIEW getConversationHeaders AS
 
 DROP VIEW IF EXISTS 'getConversationDetails';
 CREATE VIEW getConversationDetails AS
-    SELECT m.Message, fu.id "From.id", fu.number "From.number", tu.id "To.id", tu.number "To.number" FROM Message m JOIN User fu on fu.id = m.FromUserId JOIN User tu on tu.id = m.ToUserId;
+    SELECT m.id, m.Message, fu.id "From.id", fu.number "From.number", tu.id "To.id", tu.number "To.number" FROM Message m JOIN User fu on fu.id = m.FromUserId JOIN User tu on tu.id = m.ToUserId;
