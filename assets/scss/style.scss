@@ -12,6 +12,7 @@ a {
     text-decoration:none;
 }
 body {
+    background-color:rgb(36,36,36);
     font-family:'Open Sans', sans-serif;
     ul {
         margin:0px;
@@ -40,8 +41,9 @@ body {
     border-radius:35px;
     margin-right:auto;
     margin-left:auto;
+    box-shadow:rgb(85, 148, 136) 0 0 30px;
     #mainscreen {
-        
+        background-color:white;
         width: inherit;
         height:580px;
         #content {
