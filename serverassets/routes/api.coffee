@@ -1,18 +1,29 @@
 express = require 'express'
 router = express.Router()
-messageService = require '../services/messageService.js'
+sqlService = require '../services/sqlService.js'
+
+router.route '/login'
+.post (req, res) ->
+    sqlService.accounts.findById req.body.id
+    .then (user) ->
+        if not user
+            res.sendStatus 403
 
 router.route '/user/:userid/conversations/:conid'
 .get (req,res) ->
-    messageService.getAllMessagesForConversation req.params.conid
+    sqlService.messages.getConversationBetweenUsers req.params.userid, req.params.conid
     .then (messages) ->
         res.json messages
         return
     return
+.post (req, res) ->
+    sqlService.messages.addMessageBetweenUsers req.params.userid, req.params.conid, req.body.message
+    .then ->
+        res.sendStatus 200
 
 router.route '/user/:id/conversations'
 .get (req,res) ->
-    messageService.getAllConversationsForUser req.params.id
+    sqlService.messages.getConversationsForUser req.params.id
     .then (conversations) ->
         res.json conversations
         return

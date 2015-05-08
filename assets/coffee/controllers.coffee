@@ -1,13 +1,16 @@
-angular.module 'app.controllers', ['app.services', 'app.directives', 'app.resources']
+angular.module 'app.controllers', ['app.services', 'app.directives']
 .controller 'LoginController', ->
     console.log 'login initialised'
     return
+    
 .controller 'DeviceController', ->
     console.log 'device initialised'
     return
+    
 .controller 'SpringboardController', ->
     console.log 'springboard initialised'
     return
+    
 .controller 'PhoneController', ->
     console.log 'phone initialised'
     #Hide back button on first load.
@@ -29,26 +32,33 @@ angular.module 'app.controllers', ['app.services', 'app.directives', 'app.resour
         return
     )
     return
+    
 .controller 'ContactsController', ->
     console.log 'contacts initialised'
     return
+    
 .controller 'MessagesListController', ($scope, messageService, Conversation)->
     console.log 'messageslist initialised'
     $scope.conversations = messageService.getConversationHeaders()
+    $scope.conversations.$promise
+    .then (m) ->
+        console.log m
     return
+    
 .controller 'MessagesDetailController', ($scope, $stateParams, messageService, phoneService)->
     console.log 'messagedetail initialised'
-    messageService.getMessagesInConversation $stateParams.id
-    .$promise.then (messages) ->
-        console.log messages
-    $scope.conversation = if $stateParams.id? then messageService.getMessagesInConversation($stateParams.id) else {from:phoneService.number}
-    
+    $scope.conversation = messageService.getMessagesInConversation($stateParams.id)
+    $scope.contact =
+        number:$stateParams.Contact
     $('#msgbox').keydown (key) ->
         if key.which is 13 then $scope.sendmsg($scope.newmessage)
         return
 
     $scope.sendmsg = (msg) ->
+        return if msg is ""
         $('#msgbox').val = ""
         $scope.newmessage = ""
         console.log msg
+        $scope.conversation.push {message:msg, From:id:phoneService.id, To:id:$stateParams.id}
+        messageService.sendMessageToUser $stateParams.id, msg
     return

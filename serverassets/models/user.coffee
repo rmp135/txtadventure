@@ -5,5 +5,5 @@ module.exports = (sequelize, DataTypes) ->
      freezeTableName:true, timestamps:false
      classMethods: 
       associate: (models) ->
-       User.belongsToMany models.Conversation, through: 'ConversationUser'
+       User.belongsToMany models.User, {as:'Contacts', through:'Contacts'}
     return User

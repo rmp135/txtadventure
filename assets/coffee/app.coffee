@@ -25,14 +25,12 @@ angular.module 'app', ['ui.router', 'ngAnimate', 'app.controllers']
       url: '/messages/'
       controller: 'MessagesListController'
       templateUrl: '/views/messageslist.html'
-    .state 'messagedetail',
+    .state 'messagesdetail',
       url: '/messages/:id'
       controller: 'MessagesDetailController'
       templateUrl: 'views/messagedetail.html'
-    .state 'newmessagedetail',
-      url: '/messages/new'
-      controller: 'MessagesDetailController'
-      templateUrl: 'views/messagedetail.html'
+      params:
+        Contact:{}
     return
 .run ($rootScope, $state, $stateParams) ->
     $rootScope.$state = $state

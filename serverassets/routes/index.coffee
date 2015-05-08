@@ -1,6 +1,5 @@
 express = require 'express'
 router = express.Router()
-messageService = require '../services/messageService.js'
 
 router.get '/', (req, res, next) ->
   res.render 'index', title: 'Express'

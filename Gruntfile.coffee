@@ -16,10 +16,12 @@ module.exports = (grunt) ->
                     ext:'.css'
                     ]
         coffee: 
-            compile:
+            client:
                 files: 
                     'public/js/app.js': 'assets/coffee/*.coffee'
             server:
+                options:
+                    bare:true
                 files: [
                     expand:true
                     src:'**/*.coffee'
@@ -40,7 +42,7 @@ module.exports = (grunt) ->
         watch:
             coffee:
                 files: 'assets/coffee/*.coffee'
-                tasks:['coffee']
+                tasks:['coffee:client']
             server:
                 files: 'serverassets/**/*.coffee'
                 tasks:['coffee:server']

@@ -53,6 +53,8 @@ angular.module 'app.services', ['app.resources']
         Conversation.query({userid:phoneService.id})
     @getMessagesInConversation = (id) ->
         Conversation.query({userid:phoneService.id, id:id})
+    @sendMessageToUser = (userid, message) ->
+        Conversation.save({userid:phoneService.id, id:userid},{message:message})
     return @
 .factory 'phoneService', ->
     @number = "001"

@@ -1,17 +1,13 @@
-DELETE FROM User;
-DElETE FROM Conversation;
-DELETE FROM Message;
+INSERT INTO User(number)values('001'),('07752637462'),('07723648273'),('07782736421'),('07799872876');
+INSERT INTO Contacts(UserId, ContactId)VALUES(1,2),(1,3),(2,3),(1,5);
 
-INSERT INTO User(number)values('001'),('002'),('003'),('004');
-INSERT INTO Conversation(id)VALUES(null),(null),(null);
-INSERT INTO Message(message, ConversationId, UserId)VALUES
-    ('this is a message', 1,1),
-    ('this is a reply',1,2),
-    ('this is for another conversation',2,3),
-    ('message from 1',3,1),
-    ('message back from 4',3,4);
+INSERT INTO Message(message, FromUserId, ToUserId)VALUES ('from 001 to 002', 1,2), ('from 002 to 001',2,1), ('from 002 to 003',2,3), ('from 003 to 004',3,4), ('from 003 to 004 again',3,4);
+
 
 DROP VIEW IF EXISTS 'getConversationHeaders';
-CREATE VIEW getConversationHeaders AS 
-SELECT * FROM
-    (SELECT c.id 'Conversation.id', m.message 'Conversation.snippet', cu.UserId 'User.id' FROM Conversation c JOIN (SELECT c.id ConversationId, m.UserId FROM Conversation c JOIN Message m on m.ConversationId = c.id) cu on c.id = cu.ConversationId JOIN Message m on m.ConversationId = c.id ORDER BY m.id);
+CREATE VIEW getConversationHeaders AS
+    SELECT c.UserId, c.ContactId, u.number number, "No messages." LastMessage FROM Contacts c JOIN User u on u.id = c.ContactId;
+
+DROP VIEW IF EXISTS 'getConversationDetails';
+CREATE VIEW getConversationDetails AS
+    SELECT m.Message, fu.id "From.id", fu.number "From.number", tu.id "To.id", tu.number "To.number" FROM Message m JOIN User fu on fu.id = m.FromUserId JOIN User tu on tu.id = m.ToUserId;
