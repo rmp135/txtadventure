@@ -29,8 +29,16 @@ angular.module 'app', ['ui.router', 'ngAnimate', 'app.controllers']
       url: '/messages/:id'
       controller: 'MessagesDetailController'
       templateUrl: 'views/messagedetail.html'
+      resolve:
+        conversation: ($stateParams, messageService) ->
+          return messageService.getMessagesInConversation($stateParams.id).$promise
       params:
         Contact:{}
+    .state 'terminal',
+      url: '/terminal'
+      controller: 'TerminalController'
+      templateUrl: '/views/terminal.html'
+      
     return
 .run ($rootScope, $state, $stateParams) ->
     $rootScope.$state = $state

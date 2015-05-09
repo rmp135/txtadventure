@@ -1,0 +1,30 @@
+.hidden {
+    display: none;
+}
+#terminal-viewport {
+    overflow-y:auto;
+    -webkit-user-select:none;
+    cursor:default;
+    height: inherit;
+    background-color:rgb(8,8,8);
+    color:white;
+    #output {
+        pre {
+            white-space:pre-wrap;
+        }
+    }
+    #input {
+        // height:15px;
+        // margin:1em 0px;
+        span {
+            font-family:monospace;
+        }
+        #target {
+            width:1px;
+            height:1px;
+            color:transparent;
+            opacity:0;
+            vertical-align:bottom;
+        }
+    }
+}

@@ -1,0 +1,7 @@
+div#terminal-viewport
+  div#output
+  div#input(ng-show='enabled')
+    span#prompt > 
+    span#text{{commandLine}}
+      input#target(ng-model="commandLine" inputMask)
+    span#cursor.hidden(ng-show='flashing') _
