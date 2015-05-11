@@ -26,7 +26,7 @@ angular.module 'app.controllers', ['app.services', 'app.directives']
     
     addPhoneEventHandler x for x in $('.numkey')
     
-    document.getElementById('backbtn').children[0].addEventListener('mousedown', ->
+    $('#backbtn').children()[0].addEventListener('mousedown', ->
         $('#numberoutput')[0].innerHTML = ""
         $('#backbtn').children().css('display','none')
         return
@@ -49,7 +49,7 @@ angular.module 'app.controllers', ['app.services', 'app.directives']
     console.log 'messagedetail initialised'
     scrollToTop = ->
         $timeout ->
-            messageThread = document.getElementById('conversationlist');
+            messageThread = $('#conversationlist');
             messageThread.scrollTop = messageThread.scrollHeight;
         ,0
         
