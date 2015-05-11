@@ -12,29 +12,33 @@ class Context
     @models = {}
   query: (query) ->
     @sequelize.query query
-  sync: (options) ->
+
+  sync: ->
+    debug 'Synchronising models.'
+    fs.readdirSync __dirname
+    .filter (file) ->
+        (file.indexOf('.') != 0 && file != 'index.js')
+    .forEach (file) =>
+      model = @sequelize.import(path.join(__dirname, file))
+      this.models[model.name] = model
+    
+    Object.keys(@models).forEach (modelName) =>
+      if 'associate' of _this.models[modelName]
+        @models[modelName].associate(@models)
+    debug "Completed model synchronisation."
+
+  recreate: (options) ->
+    debug "Recreating database."    
     return new Promise (resolve, reject) =>
-      debug 'Synchronising models.'
-      fs.readdirSync __dirname
-      .filter (file) ->
-          (file.indexOf('.') != 0 && file != 'index.js')
-      .forEach (file) =>
-        model = @sequelize.import(path.join(__dirname, file))
-        this.models[model.name] = model
-      
-      Object.keys(@models).forEach (modelName) =>
-        if 'associate' of _this.models[modelName]
-          @models[modelName].associate(@models)
-        return
       @sequelize.sync force:(if options?.force then options.force else false)
+      .then ->
+        "Completed database recreation."
+        resolve()
+        return
       .catch (err) ->
         if (err)
           throw err;
-      .then ->
-        debug "Completed model synchronisation."
-        do resolve
-        return
-              
+    
   loadFixtures: (fixtureFile) ->
     return new Promise (resolve, reject) =>
       debug "Loading fixtures from file #{fixtureFile}"

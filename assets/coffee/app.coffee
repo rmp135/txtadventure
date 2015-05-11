@@ -1,4 +1,4 @@
-angular.module 'app', ['ui.router', 'ngAnimate', 'app.controllers']
+angular.module 'app', ['ui.router', 'ngAnimate', 'app.controllers', 'app.filters']
 #.config ($resourceProvider) ->
     #$resourceProvider.defaults.stripTrailingSlashes = false
     #return

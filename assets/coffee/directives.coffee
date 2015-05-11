@@ -12,7 +12,7 @@ angular.module 'app.directives', ['app.services']
         restrict:'A'
         scope:{message:"="}
         link: (scope, el, att) ->
-            id = phoneService.id
+            id = phoneService.currentUser.id
             if id is scope.message.From.id
                 el.addClass 'message-right'
             else
@@ -22,7 +22,7 @@ angular.module 'app.directives', ['app.services']
     return {
         restrict:'E'
         transclude:true
-        controller: 'TerminalController'
+        #controller: 'TerminalController'
         templateUrl: 'views/terminalDirective.html'
         replace:true
         compile: (tElement, tAttrs, transclude) ->
@@ -34,10 +34,13 @@ angular.module 'app.directives', ['app.services']
                   input = angular.element('#target')
                   viewport = angular.element('#terminal-viewport')[0]
                   
-                  input.on 'keypress', (e) ->
-                    if e.which is 13 && $scope.flashing
-                      $scope.execute $scope.commandLine
+                  ctrlDown = false
                   
+                  input.on 'keypress', (e) ->
+                    if $scope.flashing
+                      if e.which is 13 and $scope.flashing
+                        $scope.execute $scope.commandLine
+
                   input.on 'focus', ->
                     $scope.flashing = true
                   
@@ -54,10 +57,10 @@ angular.module 'app.directives', ['app.services']
                   , 500
                   
                   scrollToTop = ->
-                    console.log viewport.scrollTop
+                    #console.log viewport.scrollTop
                     if viewport.scrollTop isnt 0
                       $timeout ->
-                        console.log viewport.scrollTop
+                        #console.log viewport.scrollTop
                         viewport.scrollTop = viewport.scrollHeight
                       , 0
                   
@@ -85,34 +88,36 @@ angular.module 'app.directives', ['app.services']
                     cyclesremaining = config.cycles
                     _randomDigit = ->
                         config.digits[Math.round Math.random()*(config.digits.length-1)]
+
                     _scramble = (text, i) ->
-                        $timeout ->
-                            if i isnt text.length
-                                if cyclesremaining is 0
-                                    line.textContent = line.textContent.substr(0, i) + text[i] + line.textContent.substr(i+1)
-                                    line.textContent[i] = text[i]
-                                    cyclesremaining = config.cycles
-                                    _scramble text, i+1
-                                else
-                                    line.textContent = line.textContent.substr(0, i) + _randomDigit() + line.textContent.substr(i+1)
-                                    cyclesremaining--
-                                    _scramble text, i
-                            else
-                              scrollToTop()
-                              callback() if callback?
-                        , config.delay
+                      $timeout ->
+                        if i is text.length
+                          scrollToTop()
+                          callback() if callback?
+                        else
+                          if cyclesremaining is 0
+                            line.textContent = line.textContent.substr(0, i) + text[i] + line.textContent.substr(i+1)
+                            line.textContent[i] = text[i]
+                            cyclesremaining = config.cycles
+                            _scramble text, i+1
+                          else
+                            line.textContent = line.textContent.substr(0, i) + _randomDigit() + line.textContent.substr(i+1)
+                            cyclesremaining--
+                            _scramble text, i
+
+                      , config.delay
                     _scramble text, 0
                     
                   blink = (text, callback, line) ->
                     line = createLine() if not line?
                     _blink = (text, callback, line, i) ->
                       $timeout ->
-                          if i < text.length
-                              line.textContent += text[i]
-                              _blink text, callback, line, i+1
-                          else
-                              scrollToTop()
-                              callback() if callback?
+                        if i < text.length
+                          line.textContent += text[i]
+                          _blink text, callback, line, i+1
+                        else
+                          scrollToTop()
+                          callback() if callback?
                       ,20
                     _blink text, callback, line, 0
                   
@@ -124,9 +129,9 @@ angular.module 'app.directives', ['app.services']
                       $timeout ->
                         if i < lines.length
                           if i < lines.length-1
-                            echo lines[i], (-> _echoMultiple lines, i+1, callback)
+                            blink lines[i], (-> _echoMultiple lines, i+1, callback)
                           else
-                            echo lines[i], callback
+                            blink lines[i], callback
                         else
                           scrollToTop()
                           callback()
@@ -154,6 +159,7 @@ angular.module 'app.directives', ['app.services']
 
                   $scope.accessor =
                     echo: echo
+                    echoMultiple: echoMultiple
                     scramble: scramble
                     rescramble: rescramble
                     blink: blink

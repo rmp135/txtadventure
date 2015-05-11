@@ -1,6 +1,7 @@
 module.exports = (sequelize, DataTypes) ->
     User = sequelize.define 'User',
-     number:DataTypes.STRING
+     number:DataTypes.STRING,
+     pin: DataTypes.STRING
     ,
      freezeTableName:true, timestamps:false
      classMethods: 

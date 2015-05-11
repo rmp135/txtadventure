@@ -3,6 +3,7 @@ debug = require("debug") "txtAdventure:sqlService"
 _ = require "lodash"
 Promise = require "bluebird"
 
+context = null
 context = db.createContext({storage:'db',logging:true})
 context.sync()
 
@@ -20,13 +21,36 @@ selectFromView = (viewname, where) ->
 
 exports.selectFromView = selectFromView
 exports.accounts =
-  findByNumber: (id) ->
-    context.models.User.find where:Number:id
+  createNewAccount: (number, pin) ->
+    return new Promise (resolve, reject) ->
+      context.models.User.create number:number, pin:pin
+      .then (user) ->
+        resolve id: user.dataValues.id, number:user.dataValues.number
+      
     
+  findByNumber: (number) ->
+    return new Promise (resolve, reject) ->
+      context.models.User.find
+        where:Number:number
+      ,
+        attributes: ['id','number']
+      .then (user) ->
+        if user then resolve user.dataValues else resolve null
+
+  findById: (id) ->
+    return new Promise (resolve, reject) ->
+      context.models.User.find
+        where:
+          id: id
+        attributes:
+          ['id','number']
+      .then (user) ->
+        if user then resolve user.dataValues else resolve null
+
 exports.messages = 
   getConversationsForUser: (userId) ->
     return new Promise (resolve, reject) ->
-      selectFromView 'getConversationHeaders', "WHERE UserId = #{userId}"
+      selectFromView 'getConversationHeaders', "WHERE UserId = #{userId} OR UserId IS NULL GROUP BY ContactId"
       .then (headers) ->
         resolve _.map headers[0], (header) ->
           return {

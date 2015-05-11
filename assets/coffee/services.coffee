@@ -50,13 +50,12 @@ angular.module 'app.services', ['app.resources']
             message: 'Keep firing, assholes!'
             ]
     @getConversationHeaders = ->
-        Conversation.query({userid:phoneService.id})
+        Conversation.query({userid:phoneService.currentUser.id})
     @getMessagesInConversation = (id) ->
-        Conversation.query({userid:phoneService.id, id:id})
+        Conversation.query({userid:phoneService.currentUser.id, id:id})
     @sendMessageToUser = (userid, message) ->
-        Conversation.save({userid:phoneService.id, id:userid},{message:message})
+        Conversation.save({userid:phoneService.currentUser.id, id:userid},{message:message})
     return @
 .factory 'phoneService', ->
-    @number = "001"
-    @id = 1
+    @currentUser = {id:1, number:"001"}
     return @

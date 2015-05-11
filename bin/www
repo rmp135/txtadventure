@@ -32,7 +32,8 @@ var startServer = function() {
 
 
 var context = db.createContext({storage:'db',logging:true})
-context.sync({force:true})
+context.sync()
+context.recreate({force:true})
 .then(function() {
   context.loadFixtures('fixtures.sql')
   .then(function() {

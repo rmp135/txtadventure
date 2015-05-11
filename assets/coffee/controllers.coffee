@@ -67,59 +67,88 @@ angular.module 'app.controllers', ['app.services', 'app.directives']
     $scope.sendmsg = (msg) ->
         return if msg is ""
         $scope.newmessage = ""
-        $scope.conversation.push {message:msg, From:id:phoneService.id, To:id:$stateParams.id}
+        $scope.conversation.push {message:msg, From:id:phoneService.currentUser.id, To:id:$stateParams.id}
         messageService.sendMessageToUser $stateParams.id, msg
         do scrollToTop
 
     return
 
-.controller 'TerminalController', ($timeout, $scope) ->
+.controller 'TerminalController', ($timeout, $scope, $state) ->
   console.log 'terminal initialised'
   $scope.enabled = false
   $scope.flashing = false
   $scope.history = []
   $scope.commandLine = ''
-  #$scope.accessor = {}
+  $scope.secret = false
+  blink = null
+  
+  echo = (msg) -> $scope.accessor.echo "> #{msg}"
+  
+  state = 'main'
+  machine = new StateMachine()
+  .state 'home',
+    "l|login": ->
+      machine.transitionToState 'login'
+    "s|scramble": ->
+      $scope.flashing=false
+      $scope.accessor.scramble "SCRAMBLED!", {}, ->
+        $scope.flashing=true
+    "r|rescramble": ->
+      $scope.accessor.rescramble "RESCRAMBLED"
+    "j|join|g|generate": ->
+      machine.transitionToState "join"
+    "t|test": ->
+      console.log "put test stuff here!"
+    otherwise: ->
+      $scope.accessor.blink "Command not recognised."
+  ,
+    onEnter: ->
+      $scope.accessor.blink "Enter your command."
+    preAction: ->
+      echo $scope.commandLine
+  .state "join", 
+    otherwise: ->
+      echo "*".repeat $scope.commandLine.length
+      $scope.enabled = false
+      $scope.accessor.echoMultiple ["Accessing secure network...", "Logging in..."],{delay:500}, -> $timeout (-> $state.go('springboard')), 1000
+  ,
+    onEnter: ->
+      $scope.enabled = false
+      generateNumber = ->
+            tail = Math.round(Math.random()*Math.pow(10,8))
+            '077' + if tail > Math.pow(10,7) then tail else '0'+tail
+      blink "Generating new number...", ->
+        $scope.accessor.scramble generateNumber(), {digits:"0123456789"}, ->
+          blink "Enter a new PIN.", ->
+            $scope.flashing = true
+            $scope.enabled = true
+            $scope.secret = true
+        
+  .state 'login', 
+    "q|quit": ->
+      machine.transitionToState 'home'
+    otherwise: ->
+      machine.transitionToState "login.password"
+  ,
+    onEnter: ->
+      blink "Enter your phone number. (q) to go back"
+  .state 'login.password', {},
+    onEnter: ->
+      $scope.flashing = false
+      blink "Enter PIN for this number.", ->
+        $scope.flashing = true
+    
+  
   $timeout ->
     if $scope.accessor?
-      $scope.accessor.blink 'Welcome agent.', -> $scope.enabled = true
+      blink = $scope.accessor.blink
+      $scope.accessor.blink 'Welcome agent.', ->
+        $scope.enabled = true
+        machine.transitionToState 'home'
   , 0
-  $scope.test = (m) ->
-    m.toUpperCase()
+  
   $scope.execute = (msg) ->
-    $scope.accessor.echo '> ' + msg
-    
-    $scope.flashing = false
-    switch msg.toLowerCase()
-      when '', null
-        $scope.flashing = true
-      when 'scramble', 's'
-        $scope.accessor.scramble "SCRAMBLED!", {}, -> $scope.flashing = true
-      when 'generate', 'g'
-        generateNumber = ->
-          tail = Math.round(Math.random()*Math.pow(10,8))
-          '077' + if tail > Math.pow(10,7) then tail else '0'+tail
-        
-        $scope.accessor.blink 'Generating new number...', ->
-          $scope.accessor.scramble generateNumber(), {digits:'0123456789', cycles:5}, -> $scope.flashing= true
-      when 'rescramble', 'r'
-        $scope.accessor.rescramble 'RESCRAMBLED!', {}, -> $scope.flashing = true
-        #$scope.history.push 'Enter phone number.'
-      else
-        $scope.accessor.blink 'Command not recognised.', -> $scope.flashing = true
-        #$scope.$apply()
-    #$timeout ->
-      #viewport = $('#terminal-viewport')[0];
-      #viewport.scrollTop = viewport.scrollHeight;
-    #,0
-
-
-#echo 'Welcome agent.',
-  #->
-    #line = document.createElement('pre')
-    #output.appendChild line
-    #scramble
-    #rescramble line, 'ENCRYPTED TEXT!',{},->
-      #$scope.enabled = true 
-    #rescramble line, 'abcdefghijklmnopqrstuvwxyz'.toUpperCase(), 10, 50, 'LAJFISLAJW', 'SCRAMBLED!' ->
-      #scramble '07754757318', '0123456789', 10, 50, line, ->
+    #$scope.commandLine = ''
+    msg = msg.toLowerCase()
+    machine.performAction msg
+    $scope.commandLine = ''

@@ -1,6 +1,9 @@
 express = require 'express'
 router = express.Router()
 sqlService = require '../services/sqlService.js'
+schemas = require '../schemas.js'
+validate = require "express-validation"
+debug = require("debug") "txtAdventure:api"
 
 router.route '/login'
 .post (req, res) ->
@@ -8,6 +11,21 @@ router.route '/login'
     .then (user) ->
         if not user
             res.sendStatus 403
+
+router.post '/user', validate(body:schemas.UserCreateSchema), (req, res) ->
+    sqlService.accounts.createNewAccount req.body.number, req.body.pin
+    .then (user) ->
+        res.json user
+
+router.get '/user/:id', (req, res) ->
+  debug sqlService.accounts
+  sqlService.accounts.findById req.params.id
+  .then (user) ->
+    debug user
+    if user
+      res.json user
+    else
+      res.sendStatus 404
 
 router.route '/user/:userid/conversations/:conid'
 .get (req,res) ->
@@ -29,4 +47,7 @@ router.route '/user/:id/conversations'
         return
     return
 
+router.use (err, req, res, next) ->
+    res.status(400).json err
+    
 module.exports = router;
