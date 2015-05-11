@@ -10,19 +10,17 @@ express = require 'express'
 server = require('http').createServer(require '../app')
 schemas = require('../server/schemas.js')
 
-db = require('../server/models')
 rewire = require "rewire"
-sqlService = rewire '../server/services/sqlService.js'
+context = require('../server/models')
+sqlService = require '../server/services/sqlService.js'
 
 before (done) ->
-  context = db.createContext({storage:'test',logging:true})
-  context.sync()
+  context.createContext({storage:'test',logging:true})
   context.recreate force:true
   .then ->
-    sqlService.__set__ "context", context
     context.loadFixtures 'fixtures.sql'
-    .then ->
-        done()
+  .then ->
+    done()
 
 describe 'api', ->
   before  ->

@@ -1,11 +1,7 @@
-db = require("../models")
+context = require("../models")
 debug = require("debug") "txtAdventure:sqlService"
 _ = require "lodash"
 Promise = require "bluebird"
-
-context = null
-context = db.createContext({storage:'db',logging:true})
-context.sync()
 
 selectFromView = (viewname, where) ->
   query = "SELECT * FROM "

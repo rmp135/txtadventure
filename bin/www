@@ -7,7 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('app');
 var http = require('http');
-var db = require('../server/models')
+var context = require('../server/models')
 var fs = require('fs');
 /**
  * Get port from environment and store in Express.
@@ -31,8 +31,7 @@ var startServer = function() {
 }
 
 
-var context = db.createContext({storage:'db',logging:true})
-context.sync()
+context.createContext({storage:'db',logging:true})
 context.recreate({force:true})
 .then(function() {
   context.loadFixtures('fixtures.sql')
