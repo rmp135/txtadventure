@@ -130,6 +130,21 @@ describe 'sqlService', ->
       .then (conversations) ->
         expect(Joi.validate(conversations, schemas.ConversationListSchema).error).to.be.null
         done()
+        
+    it 'should show contacts if they have never sent a message', (done) ->
+      sqlService.accounts.createNewAccount (new Date().getTime()), (new Date().getTime())
+      .then (user) ->
+        sqlService.accounts.createNewAccount (new Date().getTime()), (new Date().getTime())
+        .then (user2) ->
+          sqlService.contacts.addContactToUser user.id, user2.id
+          .then ->
+            sqlService.messages.getConversationsForUser user.id
+            .then (conversations) ->
+              expect(Joi.validate(conversations, schemas.ConversationListSchema).error).to.be.null
+              conversations.length.should.equal 1
+              conversations[0].Contact.id.should.equal user2.id
+              done()
+        
       
     it 'should display the conversations between two users', (done) ->
         sqlService.messages.getConversationBetweenUsers 1, 2

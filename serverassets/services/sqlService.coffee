@@ -46,7 +46,14 @@ exports.accounts =
 exports.messages = 
   getConversationsForUser: (userId) ->
     return new Promise (resolve, reject) ->
-      selectFromView 'getConversationHeaders', "WHERE UserId = #{userId} OR UserId IS NULL GROUP BY ContactId"
+      query = "select IFNULL(m.message, 'No messages.') LastMessage, c.ContactId ContactId, u.number number from Contacts c LEFT OUTER JOIN (
+              	select * from (
+                	SELECT FromUserId UserId, ToUserId ContactId, Message, id FROM Message
+                	UNION ALL
+                	SELECT ToUserId UserId, FromUserId ContactId, Message, id FROM Message
+              	) where UserId = #{userId} group by ContactId
+              ) m on m.ContactId = c.ContactId JOIN User u on u.id = c.ContactId where c.UserId = #{userId} group by c.ContactId"
+      context.query query
       .then (headers) ->
         resolve _.map headers[0], (header) ->
           return {
