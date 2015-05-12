@@ -101,6 +101,10 @@ angular.module 'app.controllers', ['app.services', 'app.directives']
       machine.transitionToState "join"
     "t|test": ->
       console.log "put test stuff here!"
+    "your command|your command.": ->
+      $scope.flashing = false
+      $scope.accessor.blink "No one likes a smartass.", ->
+        $scope.flashing = true
     otherwise: ->
       $scope.accessor.blink "Command not recognised."
   ,
