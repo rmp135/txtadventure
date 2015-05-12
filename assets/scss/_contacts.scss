@@ -4,9 +4,18 @@
             border-top:none;
         }
         li {
-            padding: 25px 0px 25px 20px;
+            padding: 25px;
             border-top:grey 1px solid;
-            cursor:pointer;
+            // cursor:pointer;
+            #buttons {
+                float: right;
+                * {
+                    padding-right:25px;
+                }
+                *:last-child {
+                    padding-right:0px;
+                }
+            }
         }
     }
 }

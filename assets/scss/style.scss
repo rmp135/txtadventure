@@ -8,6 +8,10 @@
 @import 'login';
 @import 'terminal';
 
+ui-sref {
+    cursor:pointer;
+}
+
 a {
     color:black;
     text-decoration:none;

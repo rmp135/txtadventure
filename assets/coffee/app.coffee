@@ -17,6 +17,8 @@ angular.module 'app', ['ui.router', 'ngAnimate', 'app.controllers', 'app.filters
       url: '/phone'
       controller: 'PhoneController'
       templateUrl: '/views/phone.html'
+      params:
+        number:{}
     .state 'contacts',
       url: '/contacts'
       controller: 'ContactsController'

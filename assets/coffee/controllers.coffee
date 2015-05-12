@@ -11,27 +11,31 @@ angular.module 'app.controllers', ['app.services', 'app.directives']
     console.log 'springboard initialised'
     return
     
-.controller 'PhoneController', ->
-    console.log 'phone initialised'
-    #Hide back button on first load.
+.controller 'PhoneController', ($scope, $stateParams) ->
+  console.log 'phone initialised'
+  
+  if Object.keys($stateParams.number).length isnt 0
+    $scope.number = $stateParams.number
+    $('#backbtn').children().css('display','')
+  else 
+    $scope.number = ""
     $('#backbtn').children().css('display','none')
-    addPhoneEventHandler = (el) ->
-        el.addEventListener('mousedown', (e) ->
-            numpad = $('#numberoutput')[0]
-            numpad.innerHTML = numpad.innerHTML + e.target.innerHTML
-            $('#backbtn').children().css('display','')
-            )
-        return
-    
-    addPhoneEventHandler x for x in $('.numkey')
-    
-    $('#backbtn').children()[0].addEventListener('mousedown', ->
-        $('#numberoutput')[0].innerHTML = ""
-        $('#backbtn').children().css('display','none')
-        return
-    )
-    return
-    
+
+  #Hide back button on first load.
+  addPhoneEventHandler = (el) ->
+    el.addEventListener 'mousedown', (e) ->
+      numpad = $('#numberoutput')[0]
+      $scope.number = $scope.number + e.target.innerHTML
+      $('#backbtn').children().css('display','')
+      $scope.$apply()
+
+  addPhoneEventHandler x for x in $('.numkey')
+  
+  $('#backbtn').children()[0].addEventListener 'mousedown', ->
+      $scope.number = ""
+      $('#backbtn').children().css('display','none')
+      $scope.$apply()
+
 .controller 'ContactsController', ($scope, contactService, contacts) ->
   $scope.contacts = contacts
   return

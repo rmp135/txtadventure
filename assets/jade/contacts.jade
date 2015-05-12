@@ -8,4 +8,10 @@ div#navbar
 div#content.scrollable
   div#contactslist
     ul
-      li(ng-repeat="s in contacts") {{s.number}}
+      li(ng-repeat="s in contacts")
+        span {{s.number}}
+        span#buttons
+          a(ui-sref="messagesdetail({id:s.id})")
+              i.fa.fa-comment
+          a(ui-sref="phone({number:s.number})")
+            i.fa.fa-phone
