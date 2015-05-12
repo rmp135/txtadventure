@@ -8,14 +8,4 @@ div#navbar
 div#content.scrollable
   div#contactslist
     ul
-      li THIS IS SOME TEXT
-      li THIS IS SOME TEXT
-      li THIS IS SOME TEXT
-      li THIS IS SOME TEXT
-      li THIS IS SOME TEXT
-      li THIS IS SOME TEXT
-      li THIS IS SOME TEXT
-      li THIS IS SOME TEXT
-      li THIS IS SOME TEXT
-      li THIS IS SOME TEXT
-      li THIS IS SOME TEXT
+      li(ng-repeat="s in contacts") {{s.number}}

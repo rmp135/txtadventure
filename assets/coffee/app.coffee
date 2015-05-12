@@ -1,7 +1,7 @@
 angular.module 'app', ['ui.router', 'ngAnimate', 'app.controllers', 'app.filters']
-#.config ($resourceProvider) ->
-    #$resourceProvider.defaults.stripTrailingSlashes = false
-    #return
+.config ($resourceProvider) ->
+    $resourceProvider.defaults.stripTrailingSlashes = false
+    return
 .config ($urlRouterProvider, $stateProvider) ->
     $urlRouterProvider.otherwise 'springboard'
     $stateProvider
@@ -21,6 +21,9 @@ angular.module 'app', ['ui.router', 'ngAnimate', 'app.controllers', 'app.filters
       url: '/contacts'
       controller: 'ContactsController'
       templateUrl: '/views/contacts.html'
+      resolve:
+        contacts: (contactService, phoneService) ->
+          contactService.getContacts phoneService.currentUser.id
     .state 'messageslist',
       url: '/messages/'
       controller: 'MessagesListController'
@@ -31,9 +34,9 @@ angular.module 'app', ['ui.router', 'ngAnimate', 'app.controllers', 'app.filters
       templateUrl: 'views/messagedetail.html'
       resolve:
         conversation: ($stateParams, messageService) ->
-          return messageService.getMessagesInConversation($stateParams.id).$promise
-      params:
-        Contact:{}
+          messageService.getMessagesInConversation($stateParams.id).$promise
+        contact: ($stateParams, User) ->
+          User.get id:$stateParams.id
     .state 'terminal',
       url: '/terminal'
       controller: 'TerminalController'

@@ -19,7 +19,7 @@ recreate = (options) ->
   return new Promise (resolve, reject) ->
     sequelize.sync force:(if options?.force then options.force else false)
     .then ->
-      "Completed database recreation."
+      debug "Completed database recreation."
       resolve()
       return
     .catch (err) ->

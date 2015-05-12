@@ -14,6 +14,8 @@ rewire = require "rewire"
 context = require('../server/models')
 sqlService = require '../server/services/sqlService.js'
 
+randomNumber = Math.floor(Math.random()*100000)
+
 before (done) ->
   context.createContext({storage:'test',logging:true})
   context.recreate force:true
@@ -28,8 +30,7 @@ describe 'api', ->
   after ->
     server.close()
   root = "http://localhost:#{process.env.PORT}/api"
-  describe 'Users', ->
-    userSchema = 
+  describe.only 'Users', ->
     it 'should not allow adding a user with no number', (done) ->
       request root
       .post '/user'
@@ -88,7 +89,7 @@ describe 'api', ->
 
     it 'should 404 returning a user that does not exist', (done) ->
       request root
-      .get '/user/222'
+      .get "/user/222/contacts"
       .end (err, res) ->
         throw err if err
         res.status.should.equal 404
@@ -97,7 +98,63 @@ describe 'api', ->
     it.skip 'should 404 updating a user that does not exist', (done) ->
       done()
 
+    it 'should return the list of contacts for a user', (done) ->
+      Promise.join (sqlService.accounts.createNewAccount randomNumber, randomNumber), (sqlService.accounts.createNewAccount randomNumber, randomNumber)
+      .then (users) ->
+        [user1, user2] = users
+        sqlService.contacts.addContactToUser user1.id, user2.id
+        .then ->
+          request root
+          .get "/user/#{user1.id}/contacts"
+          .end (err, res) ->
+            throw err if err
+            expect(Joi.validate(res.body, schemas.ContactListSchema).error).to.be.null
+            done()
+
+    it 'should 404 returning the list of contacts for a user that does not exist', (done) ->
+      request root
+      .get "/user/9999/contacts/"
+      .end (err, res) ->
+        throw err if err
+        res.status.should.equal 404
+        done()
+    
+    it 'should return an empty array when returning a list of contacts where the user has no contacts', (done) ->
+      sqlService.accounts.createNewAccount randomNumber, randomNumber
+      .then (user) ->
+        request root
+        .get "/user/#{user.id}/contacts"
+        .end (err, res) ->
+          throw err if err
+          res.body.should.be.a 'array'
+          res.body.should.be.empty
+          done()
+
 describe 'sqlService', ->
+  describe 'contacts', ->
+    it 'should be able to add a new contact by id', (done) ->
+      sqlService.accounts.createNewAccount (new Date().getTime()), (new Date().getTime())
+      .then (user) ->
+        sqlService.accounts.createNewAccount (new Date().getTime()), (new Date().getTime())
+        .then (user2) ->
+          sqlService.contacts.addContactToUser user.id, user2.id
+          .then ->
+            done()
+
+    it 'should be able to return a list of all contacts by user', (done) ->
+      sqlService.accounts.createNewAccount (new Date().getTime()), (new Date().getTime())
+      .then (user) ->
+        sqlService.accounts.createNewAccount (new Date().getTime()), (new Date().getTime())
+        .then (user2) ->
+          sqlService.contacts.addContactToUser user.id, user2.id
+          .then ->
+            sqlService.contacts.getContactsForUser user.id
+            .then (contacts) ->
+              expect(Joi.validate(contacts, schemas.ContactListSchema).error).to.be.null
+              contacts.length.should.equal(1)
+              contacts[0].should.equal(user2)
+              done()
+
   describe 'accounts', ->
 
     it 'should create a new account', (done) ->

@@ -30,7 +30,7 @@ class StateMachine
     return if not @currentState
     @currentState.callbacks.preAction()
     action = @currentState.actions[actionName]
-    if not action? then @currentState.actions.otherwise(actionName) else action()
+    if action then action() else @currentState.actions.otherwise(actionName)
     @currentState.callbacks.postAction()
 
   state: (stateName, actions, callbacks) ->

@@ -27,6 +27,16 @@ router.get '/user/:id', (req, res) ->
     else
       res.sendStatus 404
 
+router.get '/user/:id/contacts', (req, res) ->
+  sqlService.accounts.findById req.params.id
+  .then (user) ->
+    if not user
+      res.sendStatus 404
+    else
+      sqlService.contacts.getContactsForUser req.params.id
+      .then (contacts) ->
+        res.json contacts
+
 router.route '/user/:userid/conversations/:conid'
 .get (req,res) ->
     sqlService.messages.getConversationBetweenUsers req.params.userid, req.params.conid
@@ -47,7 +57,7 @@ router.route '/user/:id/conversations'
         return
     return
 
-router.use (err, req, res, next) ->
-    res.status(400).json err
-    
+#router.use (err, req, res, next) ->
+    #res.status(400).json err
+    #
 module.exports = router;

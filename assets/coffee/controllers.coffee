@@ -20,7 +20,6 @@ angular.module 'app.controllers', ['app.services', 'app.directives']
             numpad = $('#numberoutput')[0]
             numpad.innerHTML = numpad.innerHTML + e.target.innerHTML
             $('#backbtn').children().css('display','')
-            console.log e.target.id
             )
         return
     
@@ -33,10 +32,10 @@ angular.module 'app.controllers', ['app.services', 'app.directives']
     )
     return
     
-.controller 'ContactsController', ->
-    console.log 'contacts initialised'
-    return
-    
+.controller 'ContactsController', ($scope, contactService, contacts) ->
+  $scope.contacts = contacts
+  return
+  
 .controller 'MessagesListController', ($scope, messageService, Conversation)->
     console.log 'messageslist initialised'
     $scope.conversations = messageService.getConversationHeaders()
@@ -45,20 +44,19 @@ angular.module 'app.controllers', ['app.services', 'app.directives']
         console.log m
     return
     
-.controller 'MessagesDetailController', ($scope, $stateParams, $timeout, messageService, phoneService, conversation)->
+.controller 'MessagesDetailController', ($scope, $stateParams, $timeout, messageService, phoneService, conversation, contact)->
     console.log 'messagedetail initialised'
+    $scope.conversation = conversation
+    $scope.contact = contact
     scrollToTop = ->
         $timeout ->
             messageThread = $('#conversationlist');
-            messageThread.scrollTop = messageThread.scrollHeight;
+            messageThread.scrollTop(messageThread[0].scrollHeight);
         ,0
         
-    do scrollToTop
+    scrollToTop()
     
-    $scope.conversation = conversation
-
-    $scope.contact =
-        number:$stateParams.Contact
+    # conversation and contact is pulled from the app resolve function before the page loads.
 
     $('#msgbox').keydown (key) ->
         if key.which is 13 then $scope.sendmsg($scope.newmessage)
@@ -69,7 +67,7 @@ angular.module 'app.controllers', ['app.services', 'app.directives']
         $scope.newmessage = ""
         $scope.conversation.push {message:msg, From:id:phoneService.currentUser.id, To:id:$stateParams.id}
         messageService.sendMessageToUser $stateParams.id, msg
-        do scrollToTop
+        scrollToTop()
 
     return
 

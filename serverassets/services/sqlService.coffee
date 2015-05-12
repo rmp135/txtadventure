@@ -16,8 +16,28 @@ selectFromView = (viewname, where) ->
   context.query query
 
 exports.selectFromView = selectFromView
+exports.contacts = 
+  getContactsForUser: (userId) ->
+    return new Promise (resolve, reject) ->
+      context.models.User.build id: userId
+      .getContacts(attributes:['id','number'])
+      .then (contacts) ->
+        resolve (_.map contacts, (contact) ->
+          c = contact.toJSON()
+          delete c.Contacts
+          return c
+          )
+        
+  addContactToUser: (userId, contactId) ->
+    return new Promise (resolve, reject) ->
+      context.models.User.build id:userId
+      .addContact contactId
+      .then ->
+        resolve()
+      
 exports.accounts =
   createNewAccount: (number, pin) ->
+    debug "Creating new account for number #{number}."
     return new Promise (resolve, reject) ->
       context.models.User.create number:number, pin:pin
       .then (user) ->
@@ -47,11 +67,13 @@ exports.messages =
   getConversationsForUser: (userId) ->
     return new Promise (resolve, reject) ->
       query = "select IFNULL(m.message, 'No messages.') LastMessage, c.ContactId ContactId, u.number number from Contacts c LEFT OUTER JOIN (
-              	select * from (
-                	SELECT FromUserId UserId, ToUserId ContactId, Message, id FROM Message
-                	UNION ALL
-                	SELECT ToUserId UserId, FromUserId ContactId, Message, id FROM Message
-              	) where UserId = #{userId} group by ContactId
+                select * from (
+                	select * from (
+                  	SELECT FromUserId UserId, ToUserId ContactId, Message, id FROM Message
+                  	UNION ALL
+                  	SELECT ToUserId UserId, FromUserId ContactId, Message, id FROM Message
+                	) order by id asc
+              	)where UserId = #{userId} group by ContactId
               ) m on m.ContactId = c.ContactId JOIN User u on u.id = c.ContactId where c.UserId = #{userId} group by c.ContactId"
       context.query query
       .then (headers) ->
