@@ -14,7 +14,7 @@ angular.module 'app.controllers', ['app.services', 'app.directives']
 .controller 'PhoneController', ($scope, $stateParams) ->
   console.log 'phone initialised'
   
-  if Object.keys($stateParams.number).length isnt 0
+  if $stateParams.number.length
     $scope.number = $stateParams.number
     $('#backbtn').children().css('display','')
   else 
