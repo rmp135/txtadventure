@@ -7,6 +7,9 @@ doctype html
 html
   head
     title TxtAdventure
+    meta(name="viewport" content="width=device-width, intitial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no")
+    meta(name="apple-mobile-web-app-capable" content="yes")
+    meta(name="apple-mobile-web-app-status-bar-style" content="black-translucent")
     +style('/css/style.css')
     +style('//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css')
     +script('//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js')
@@ -16,7 +19,10 @@ html
     +script('https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0-rc.1/angular.js')
     +script('https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0-rc.1/angular-animate.js')
     +script('https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0-rc.1/angular-resource.js')
+    +script('https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0-rc.1/angular-touch.js')
     +script('https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.14/angular-ui-router.min.js')
+    +script('//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js')
+    +script('/js/inobounce.js')
     +script('/js/app.js')
   body(ng-app="app" ng-controller="DeviceController")
     div#phone

@@ -8,6 +8,17 @@
 @import 'login';
 @import 'terminal';
 
+* {
+    margin: 0;
+    padding: 0;
+    
+}
+input {
+    // -webkit-appearance: none;
+    border-radius:0;
+    border:none;
+}
+
 ui-sref {
     cursor:pointer;
 }
@@ -36,30 +47,49 @@ body {
 }
 .scrollable {
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    
+}
+.content-view {
+    height:33rem;
+    width:inherit;
+    position:relative;
 }
 #phone {
-    width:300px;
-    height:600px;
+    @media (min-height: 36rem) and (min-width: 25rem) {
+        width:18rem;
+        height:36rem;
+        position:absolute;
+        border-width:40px 30px 90px 30px;
+        border-style: solid;
+        border-radius:35px;
+        margin-right:auto;
+        margin-left:auto;
+        box-shadow:rgb(85, 148, 136) 0 0 30px;
+    }
     border-color:black;
-    border-width:40px 30px 90px 30px;
-    border-style: solid;
-    border-radius:35px;
-    margin-right:auto;
-    margin-left:auto;
-    box-shadow:rgb(85, 148, 136) 0 0 30px;
     #mainscreen {
         background-color:white;
+        height:36rem;
         width: inherit;
-        height:580px;
-        #content {
-            height:530px;
-        }
+        bottom:2rem;
+        top:2rem;
     }
     #homebtn {
-        svg {
-            padding-top:20px;
+        a {
+            display:inline-block;
         }
-        height:5rem;
+        height:3rem;
+        @media (min-height: 40rem) and (min-width: 25rem) {
+            bottom: -4.5rem;
+            background:black;
+        }
+        padding: 0.5rem 0 0.5rem 0;
+        background:black;
+        position:absolute;
+        left:0;
+        right:0;
+        bottom:0;
         text-align:center;
     }
 }

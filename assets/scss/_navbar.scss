@@ -1,7 +1,8 @@
 #navbar {
     display:flex;
-    height:50px;
+    height:3rem;
     background-color:rgb(107, 199, 255);
+    border-bottom: #3498db 1px solid;
     line-height:50px;
     font-size:20px;
     .navsection:first-child {
