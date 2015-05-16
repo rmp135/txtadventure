@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var debug = require('debug')('txtAdventure:router')
 
 var routes = require('./server/routes/index');
 var apiroutes = require('./server/routes/api');
@@ -16,7 +17,22 @@ app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(__dirname + '/public/favicon.ico'));
-app.use(logger('dev'));
+app.use(function(req, res, next) {
+  res.on('finish', function() {
+    var status = res.statusCode
+    if (status === 404) {
+      status = '\u001b[31m'+status+'\u001b[0m'
+    }
+    else if (status === 200) {
+      status = '\u001b[32m'+status+'\u001b[0m'
+    }
+    else if (status === 304) {
+      status = '\u001b[33m'+status+'\u001b[0m'
+    }
+    debug(status + ' ' + req.method + ' https://txtadventure-rmp135.c9.io' + req.originalUrl)
+  })
+  next()
+});
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());

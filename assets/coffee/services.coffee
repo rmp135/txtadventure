@@ -3,9 +3,9 @@ angular.module 'app.services', ['app.resources']
     @getConversationHeaders = ->
         Conversation.query({userid:phoneService.currentUser.id})
     @getMessagesInConversation = (id) ->
-        Conversation.query({userid:phoneService.currentUser.id, id:id})
-    @sendMessageToUser = (userid, message) ->
-        Conversation.save({userid:phoneService.currentUser.id, id:userid},{message:message})
+        Conversation.query({userid:phoneService.currentUser.id, contactId:id})
+    @sendMessageToContact = (contactId, message) ->
+        Conversation.save({userid:phoneService.currentUser.id, contactId:contactId},{message:message})
     return @
 .factory 'contactService', (Contact) ->
     @getContacts = ->

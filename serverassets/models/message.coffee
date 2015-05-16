@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) ->
      freezeTableName:true, timestamps:false
      classMethods: 
       associate: (models) ->
-       Message.belongsTo models.User, as:'FromUser'
-       Message.belongsTo models.User, as:'ToUser'
+       Message.belongsTo models.User, as:'FromUser', foreignKey:'FromUserId'
+       Message.belongsTo models.Contact, as:'ToContact', foreignKey:'ToContactId'
        return
     return Message

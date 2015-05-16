@@ -11,16 +11,21 @@ ConversationListSchema = Joi.array().items(Joi.object().keys(
   )
 )
 
-ConversationSchema = Joi.array().items(Joi.object().keys(
-  From: ContactSchema
-  To: ContactSchema
-  message: Joi.string().required())
+NewMessageSchema= Joi.object().keys(
+  message: Joi.string().required()
 )
+
+ContactAddSchema = Joi.object().keys(
+  number: Joi.string().length(11).required()
+).required()
 
 MessageSchema = Joi.object().keys(
   message: Joi.string().required()
-  To: ContactSchema
+  time: Joi.date()
+  from: Joi.string().required()
+  to: Joi.string().required()
 )
+ConversationSchema = Joi.array().items(MessageSchema)
 
 UserCreateSchema = Joi.object().keys(
   number: Joi.string().length(11).required()
@@ -29,4 +34,4 @@ UserCreateSchema = Joi.object().keys(
 
 ContactListSchema = Joi.array().items(ContactSchema)
 
-module.exports = {ContactSchema, ConversationSchema, ConversationListSchema, MessageSchema, UserCreateSchema, ContactListSchema}
+module.exports = {ContactSchema, ConversationSchema, ConversationListSchema, MessageSchema, UserCreateSchema, ContactListSchema, NewMessageSchema}

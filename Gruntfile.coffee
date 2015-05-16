@@ -3,9 +3,18 @@ module.exports = (grunt) ->
     grunt.loadNpmTasks('grunt-contrib-watch')
     grunt.loadNpmTasks('grunt-contrib-jade')
     grunt.loadNpmTasks('grunt-contrib-sass')
+    grunt.loadNpmTasks 'grunt-mocha-test'
     
     grunt.registerTask('default','watch')
+    grunt.registerTask 'test', 'mochaTest'
     grunt.initConfig(
+        mochaTest:
+            test:
+                options:
+                    reporter:'spec'
+                    require:'coffee-script/register'
+                    bail:true
+                src: ['test/*.coffee']
         sass:
             compile:
                 files: [
@@ -16,6 +25,9 @@ module.exports = (grunt) ->
                     ext:'.css'
                     ]
         coffee: 
+            test:
+                files:
+                    'test.js': 'test.coffee'
             client:
                 files: 
                     'public/js/app.js': 'assets/coffee/*.coffee'
@@ -40,12 +52,18 @@ module.exports = (grunt) ->
                     ext:'.html'
                     ]
         watch:
+            tests:
+                files: ['test/*.coffee']
+                tasks: ['test']
+            test:
+                files: 'test.coffee'
+                tasks:['coffee:test']
             coffee:
                 files: 'assets/coffee/*.coffee'
                 tasks:['coffee:client']
             server:
                 files: 'serverassets/**/*.coffee'
-                tasks:['coffee:server']
+                tasks:['coffee:server', 'test']
             jade:
                 files:'assets/jade/*.jade'
                 tasks:['jade']

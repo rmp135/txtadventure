@@ -12,8 +12,7 @@ angular.module 'app.directives', ['app.services']
         restrict:'A'
         scope:{message:"="}
         link: (scope, el, att) ->
-            id = phoneService.currentUser.id
-            if id is scope.message.From.id
+            if phoneService.currentUser.number is scope.message.from
                 el.addClass 'message-right'
             else
                 el.addClass 'message-left'

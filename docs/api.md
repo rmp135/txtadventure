@@ -5,15 +5,19 @@
 
 Creates a new user with a given number and pin. The number must be 11 digits long. The PIN must be more than 4 digits.
 
-#### Body
+#### Request Body
 
     {number, pin}
 
-#### Returns
+#### Reponse Body
 
     {id, number}
+
+#### Response Cookies
+
+    {session}
     
-#### Errors
+#### Request Codes
 
 `400 - Number missing.`
 
@@ -28,13 +32,13 @@ Creates a new user with a given number and pin. The number must be 11 digits lon
 ## /user/:id
 ### GET
 
-Retrives a users details.
+Retrieves the details of a user.
 
-#### Returns
+#### Reponse Body
 
-    {number}
+    {id, number}
 
-#### Errors
+#### Request Codes
 
 `404 - User not found.`
 
@@ -42,11 +46,11 @@ Retrives a users details.
 
 Updates a user with new details. See adding user for more details.
 
-#### Body
+#### Request Body
 
     {number, pin}
 
-#### Status Codes
+#### Request Codes
 
 `404 - User not found.`
 
@@ -59,43 +63,67 @@ Updates a user with new details. See adding user for more details.
 `400 - PIN too short`
 
 ---
+## /user/:userid/contacts
+### GET
 
-## /user/:userid/conversations
+Retrieves the contacts for a user with id `userid`.
+
+#### Response Body
+
+    [{id, number}...]
+    
+#### POST
+
+Adds a new contact to user with id `userid`.
+
+#### Request Body
+
+    {number}
+
+#### Response Body
+
+    {id, number}
+
+---
+
+## /user/:userid/messages
 ### GET
 
 Returns a list of conversation headers for a user with the id `nuserid`. Each conversation contains the last message sent/received. If there is no last message, this field will not be populated.
 
-#### Returns
+#### Response Body
 
     [{Contact:{id, number}, LastMessage}...]
 
-#### Errors
+#### Response Codes
 
-TODO
+`404 - User not found.`
 
 ---
 
-## /user/:userid/conversations/:conid
+## /user/:userid/messages/:conid
 ### GET
 
-Returns a list of messages that occured between the user of id `userid` and user with id `conid`.
+Returns a list of messages that occured between the user of id `userid` and contact with id `conid`.
 
-#### Returns
+#### Response Body
 
-    [{FromUser:{id, number}, ToUser: {id, number}, message}...]
+    [{to, from, time, message}...]
 
-#### Errors
+#### Response Codes
 
-TODO
+`404 - User does not exist.`
+
+`404 - Contact does not exist.`
 
 ### POST
 
-Adds a new message to a conversation with id `conid` for user with id `userid`.
+Adds a new message to a conversation with id `conid` for contact with id `userid`.
 
-#### Body
+#### Request Body
 
     {message}
 
-#### Errors
+#### Response Codes
 
 TODO

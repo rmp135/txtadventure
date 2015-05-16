@@ -4,4 +4,4 @@ angular.module 'app.resources', ['ngResource']
 .factory 'Contact', ($resource) ->
   $resource '/api/user/:id/contacts'
 .factory 'Conversation', ($resource)->
-  $resource '/api/user/:userid/conversations/:id'
+  $resource '/api/user/:userid/messages/:contactId'

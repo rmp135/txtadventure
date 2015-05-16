@@ -2,113 +2,153 @@ context = require("../models")
 debug = require("debug") "txtAdventure:sqlService"
 _ = require "lodash"
 Promise = require "bluebird"
+securityService = require './securityService.js'
 
-selectFromView = (viewname, where) ->
-  query = "SELECT * FROM "
-  if not viewname?
-    throw 'A view name must be specified.'
+internals = {}
 
-  query += viewname
-  if where?
-    query += ' ' + where
+
+internals = 
+  selectFromView: (viewname, where) ->
+    query = "SELECT * FROM "
+    if not viewname?
+      throw 'A view name must be specified.'
   
-  query += ";"
-  context.query query
-
-exports.selectFromView = selectFromView
-exports.contacts = 
-  getContactsForUser: (userId) ->
-    return new Promise (resolve, reject) ->
-      context.models.User.build id: userId
-      .getContacts(attributes:['id','number'])
-      .then (contacts) ->
-        resolve (_.map contacts, (contact) ->
-          c = contact.toJSON()
-          delete c.Contacts
-          return c
-          )
-        
-  addContactToUser: (userId, contactId) ->
-    return new Promise (resolve, reject) ->
-      context.models.User.build id:userId
-      .addContact contactId
-      .then ->
-        resolve()
-      
-exports.accounts =
-  createNewAccount: (number, pin) ->
-    debug "Creating new account for number #{number}."
-    return new Promise (resolve, reject) ->
-      context.models.User.create number:number, pin:pin
-      .then (user) ->
-        resolve id: user.dataValues.id, number:user.dataValues.number
-      
+    query += viewname
+    if where?
+      query += ' ' + where
     
-  findByNumber: (number) ->
-    return new Promise (resolve, reject) ->
-      context.models.User.find
-        where:Number:number
-      ,
-        attributes: ['id','number']
-      .then (user) ->
-        if user then resolve user.dataValues else resolve null
+    query += ";"
+    context.query query
+  contacts:
+    addContactNumberToUser: (userId, number) ->
+      return new Promise (resolve, reject) ->
+        context.models.Contact.create UserId:userId, number:number
+        .then (contact) ->
+          contact = contact.toJSON()
+          delete contact.UserId
+          resolve contact
+             
 
-  findById: (id) ->
-    return new Promise (resolve, reject) ->
-      context.models.User.find
-        where:
-          id: id
-        attributes:
-          ['id','number']
-      .then (user) ->
-        if user then resolve user.dataValues else resolve null
-
-exports.messages = 
-  getConversationsForUser: (userId) ->
-    return new Promise (resolve, reject) ->
-      query = "select IFNULL(m.message, 'No messages.') LastMessage, c.ContactId ContactId, u.number number from Contacts c LEFT OUTER JOIN (
-                select * from (
-                	select * from (
-                  	SELECT FromUserId UserId, ToUserId ContactId, Message, id FROM Message
-                  	UNION ALL
-                  	SELECT ToUserId UserId, FromUserId ContactId, Message, id FROM Message
-                	) order by id asc
-              	)where UserId = #{userId} group by ContactId
-              ) m on m.ContactId = c.ContactId JOIN User u on u.id = c.ContactId where c.UserId = #{userId} group by c.ContactId"
-      context.query query
-      .then (headers) ->
-        resolve _.map headers[0], (header) ->
-          return {
-            LastMessage:header.LastMessage
-            Contact:
-              id:header.ContactId
-              number:header.number
-          }
-
-  getConversationBetweenUsers: (user1, user2) ->
-    return new Promise (resolve, reject) ->
-      Promise.join (context.models.User.find where:id:user2), (selectFromView 'getConversationDetails', "WHERE `From.id` IN(#{user1},#{user2}) AND `To.id` IN(#{user1},#{user2}) ORDER BY id ASC;")
-      .then (results) ->
-        u = results[0]
-        messages = results[1][0]
-        resolve _.map messages, (result) ->
-            {
-              message:result.message,
-              From:
-                id: result['From.id']
-                number: result['From.number']
-              To:
-                id: result['To.id']
-                number: result['To.number']
-            }
+    getContactsForUser: (userId) ->
+      return new Promise (resolve, reject) ->
+        context.models.Contact.findAll
+          where:
+            UserId: userId
+        .then (contacts) ->
+          resolve (_.map contacts, (contact) ->
+            c = contact.toJSON()
+            delete c.UserId
+            return c
+            )
+    findByNumber: (number) ->
+      return new Promise (resolve, reject) ->
+        context.models.Contact.find
+          where:number:number
+          attributes:['id','number']
+        .then (contact) ->
+          if not contact then resolve null else resolve contact.toJSON()
           
-  addMessageBetweenUsers: (user1, user2, message) ->
-    return new Promise (resolve, reject) ->
-      context.models.Message.create {
-        message:message,
-        FromUserId:user1,
-        ToUserId:user2,
-        time: new Date()
-        }
-      .then ->
-        resolve()
+    contactBelongsToUser: (userId, contactId) ->
+      return new Promise (resolve, reject) ->
+        context.models.Contact.count
+          where:
+            id:contactId
+            UserId:userId
+          attributes:['id','number']
+        .then (count) ->
+          resolve count isnt 0
+        
+  accounts:
+    createNewAccount: (number, pin) ->
+      return new Promise (resolve, reject) ->
+        debug "Creating new account for number #{number}."
+        
+        securityService.generateHash pin
+        .then (hash) ->
+          context.models.User.create number:number, passHash:hash
+        .then (user) ->
+          resolve id: user.dataValues.id, number:user.dataValues.number
+
+    findByNumber: (number) ->
+      return new Promise (resolve, reject) ->
+        context.models.User.find
+          where:Number:number
+        ,
+          attributes: ['id','number']
+        .then (user) ->
+          if user then resolve user.dataValues else resolve null
+  
+    findById: (id) ->
+      return new Promise (resolve, reject) ->
+        context.models.User.find
+          where:
+            id: id
+          attributes:
+            ['id','number']
+        .then (user) ->
+          if user then resolve user.dataValues else resolve null
+      
+    isAuthed: (number, password) ->
+      return new Promise (resolve, reject) ->
+        context.models.User.find
+          where:
+            number:number
+          attributes:['passHash']
+        .then (user) ->
+          return reject('User not found.') if not user
+          resolve (securityService.isAuthed password, user.passHash)
+
+  messages:
+    getConversationsForUser: (userId) ->
+      return new Promise (resolve, reject) ->
+        query = "select c.id ContactId, c.number, IFNULL(m.message, 'No messages.') LastMessage from Contact c LEFT OUTER JOIN (
+                	select * from (
+                		select * from (
+                			select  m.id, m.FromUserId FromUserId, u.id ToUserId, c.id ContactId, m.message, c.number from Message m JOIN Contact c on c.id = m.ToContactId LEFT OUTER JOIN User u on u.number = c.number
+                			UNION ALL
+                			select  m.id, u.id FromUserId, m.FromUserId ToUserId, c.id ContactId, m.message, c.number from Message m JOIN Contact c on c.id = m.ToContactId LEFT OUTER JOIN User u on u.number = c.number
+                		) order by id asc
+                	) where FromUserId = #{userId} GROUP BY ToUserId
+                ) m on m.ContactId = c.id where c.UserId = #{userId}"
+        context.query query
+        .then (headers) ->
+          resolve _.map headers[0], (header) ->
+            return {
+              LastMessage:header.LastMessage
+              Contact:
+                id:header.ContactId
+                number:header.number
+            }
+  
+    getConversationBetweenUserAndContact: (userId, contactId) ->
+      return new Promise (resolve, reject) ->
+        context.models.Message.findAll
+          where:ToContactId:contactId
+          include: [
+            {model:context.models.User, as:'FromUser', attributes:['number']}
+          ,
+            {model:context.models.Contact, as:'ToContact', attributes:['id','number']}
+          ]
+          attributes:['ToContactId','FromUserId', 'message']
+        .then (results) ->
+          resolve _.map results, (result) ->
+            message = result.toJSON()
+            return {
+              message:message.message
+              time:message.time
+              from:message.FromUser.number
+              to: message.ToContact.number
+            }
+    
+    sendMessageToContact: (userId, contactId, message) ->
+      return new Promise (resolve, reject) ->
+        context.models.Message.create {
+          message:message,
+          FromUserId:userId,
+          ToContactId:contactId,
+          time: new Date()
+          }
+        .then ->
+          resolve()
+
+module.exports = internals

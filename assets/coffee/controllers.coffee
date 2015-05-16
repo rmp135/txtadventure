@@ -43,9 +43,6 @@ angular.module 'app.controllers', ['app.services', 'app.directives']
 .controller 'MessagesListController', ($scope, messageService, Conversation)->
     console.log 'messageslist initialised'
     $scope.conversations = messageService.getConversationHeaders()
-    $scope.conversations.$promise
-    .then (m) ->
-        console.log m
     return
     
 .controller 'MessagesDetailController', ($scope, $stateParams, $timeout, messageService, phoneService, conversation, contact)->
@@ -69,8 +66,8 @@ angular.module 'app.controllers', ['app.services', 'app.directives']
     $scope.sendmsg = (msg) ->
         return if msg is ""
         $scope.newmessage = ""
-        $scope.conversation.push {message:msg, From:id:phoneService.currentUser.id, To:id:$stateParams.id}
-        messageService.sendMessageToUser $stateParams.id, msg
+        $scope.conversation.push {message:msg, from:phoneService.currentUser.number}
+        messageService.sendMessageToContact $stateParams.id, msg
         scrollToTop()
 
     return

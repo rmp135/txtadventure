@@ -5,6 +5,33 @@ schemas = require '../schemas.js'
 validate = require "express-validation"
 debug = require("debug") "txtAdventure:api"
 
+logResponseBody = (req, res, next) ->
+  oldWrite = res.write
+  oldEnd = res.end
+  chunks = []
+
+  res.write = (chunk) ->
+    chunks.push chunk
+    oldWrite.apply res, arguments
+    return
+
+  res.end = (chunk) ->
+    if chunk
+      chunks.push chunk
+    body = Buffer.concat(chunks).toString('utf8')
+    debug "Response: #{body}" if res.statusCode is 200
+    oldEnd.apply res, arguments
+    return
+
+  next()
+  return
+
+router.use logResponseBody
+
+router.use (req, res, next) ->
+  debug "Request: #{JSON.stringify req.body}"
+  next()
+
 router.route '/login'
 .post (req, res) ->
     sqlService.accounts.findById req.body.id
@@ -37,25 +64,48 @@ router.get '/user/:id/contacts', (req, res) ->
       .then (contacts) ->
         res.json contacts
 
-router.route '/user/:userid/conversations/:conid'
-.get (req,res) ->
-    sqlService.messages.getConversationBetweenUsers req.params.userid, req.params.conid
-    .then (messages) ->
-        res.json messages
-        return
-    return
-.post (req, res) ->
-    sqlService.messages.addMessageBetweenUsers req.params.userid, req.params.conid, req.body.message
-    .then ->
-        res.sendStatus 200
+router.post '/user/:id/contacts', validate(body:schemas.ContactAddSchema), (req, res) ->
+  sqlService.contacts.addContactNumberToUser req.params.id, req.body.number
+  .then (contact) ->
+    res.json contact
+  
 
-router.route '/user/:id/conversations'
+router.get '/user/:userid/messages/:conid', (req,res) ->
+  sqlService.contacts.contactBelongsToUser req.params.userid, req.params.conid
+  .then (belongs) ->
+    if not belongs then return res.sendStatus 404
+    sqlService.accounts.findById req.params.userid
+    .then (user) ->
+      if not user
+        res.sendStatus 404
+      else
+        sqlService.messages.getConversationBetweenUserAndContact req.params.id, req.params.conid
+        .then (messages) ->
+            res.json messages
+
+router.post '/user/:userid/messages/:conid', validate(body:schemas.NewMessageSchema), (req, res) ->
+  sqlService.contacts.contactBelongsToUser req.params.userid, req.params.conid
+  .then (belongs) ->
+    if belongs is false
+      return res.sendStatus 404
+    sqlService.accounts.findById req.params.userid
+    .then (user) ->
+      if not user?
+        res.sendStatus 404
+      else
+        sqlService.messages.sendMessageToContact req.params.userid, req.params.conid, req.body.message
+        .then ->
+            res.sendStatus 200
+
+router.route '/user/:id/messages'
 .get (req,res) ->
     sqlService.messages.getConversationsForUser req.params.id
     .then (conversations) ->
         res.json conversations
-        return
-    return
+
+#router.use (err, req, res, next) ->
+  #debug "Response: #{res}"
+  #next()    
 
 #router.use (err, req, res, next) ->
     #res.status(400).json err
