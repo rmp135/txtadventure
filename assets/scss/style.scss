@@ -15,11 +15,11 @@
 }
 input {
     // -webkit-appearance: none;
-    border-radius:0;
-    border:none;
+    // border-radius:0;
+    // border:none;
 }
 
-ui-sref {
+* [ng-click] {
     cursor:pointer;
 }
 
@@ -28,7 +28,7 @@ a {
     text-decoration:none;
 }
 body {
-    background-color:rgb(36,36,36);
+    // background-color:rgb(36,36,36);
     font-family:'Open Sans', sans-serif;
     ul {
         margin:0px;

@@ -16,7 +16,7 @@ NewMessageSchema= Joi.object().keys(
 )
 
 ContactAddSchema = Joi.object().keys(
-  number: Joi.string().length(11).required()
+  number: Joi.string().regex(/^[0-9]+$/).required()
 ).required()
 
 MessageSchema = Joi.object().keys(
@@ -34,4 +34,4 @@ UserCreateSchema = Joi.object().keys(
 
 ContactListSchema = Joi.array().items(ContactSchema)
 
-module.exports = {ContactSchema, ConversationSchema, ConversationListSchema, MessageSchema, UserCreateSchema, ContactListSchema, NewMessageSchema}
+module.exports = {ContactSchema, ConversationSchema, ConversationListSchema, MessageSchema, UserCreateSchema, ContactListSchema, NewMessageSchema, ContactAddSchema}

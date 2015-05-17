@@ -37,7 +37,27 @@ angular.module 'app.controllers', ['app.services', 'app.directives']
       $scope.$apply()
 
 .controller 'ContactsController', ($scope, contactService, contacts) ->
+  console.log 'contacts initialised'
+  $scope.adding = false
   $scope.contacts = contacts
+
+  $scope.checkForm = ->
+    return /^\d+$/.exec($scope.number) is null
+
+  $scope.toggleAdd = ->
+    $scope.adding = !$scope.adding
+    $scope.number = ""
+
+  $scope.addContact = ->
+    contactService.addContact $scope.number
+    .$promise
+    .then (response) ->
+      $scope.contacts.push response
+      $scope.error = ''
+      $scope.number = ''
+    .catch (response) ->
+      $scope.error = ''
+      $scope.number = ''
   return
   
 .controller 'MessagesListController', ($scope, messageService, Conversation)->
@@ -51,7 +71,7 @@ angular.module 'app.controllers', ['app.services', 'app.directives']
     $scope.contact = contact
     scrollToTop = ->
         $timeout ->
-            messageThread = $('#conversationlist');
+            messageThread = $('#messages');
             messageThread.scrollTop(messageThread[0].scrollHeight);
         ,0
         

@@ -116,7 +116,65 @@ describe 'api', ->
         .send number:user2.number
         .end (err, res) ->
           throw err if err
+          res.status.should.equal 200
           expect(Joi.validate(res.body, schemas.ContactSchema).error).to.be.null
+          done()
+    it 'should 404 adding to a contact where the user does not exist', (done) ->
+      sqlService.accounts.createNewAccount genString(), genString()
+      .then (user) ->
+        request root
+        .post "/user/999/contacts"
+        .send number:user.number
+        .end (err, res) ->
+          throw err if err
+          res.status.should.equal 404
+          done()
+      
+    it 'should 409 adding a contact that already exists', (done) ->
+      Promise.join (sqlService.accounts.createNewAccount genString(), genString()), (sqlService.accounts.createNewAccount genString(), genString())
+      .then (users) ->
+        [user1, user2] = users
+        sqlService.contacts.addContactNumberToUser user1.id, user2.number
+        .then ->
+          request root
+          .post "/user/#{user1.id}/contacts"
+          .send number:user2.number
+          .end (err, res) ->
+            throw err if err
+            res.status.should.equal 409
+            done()
+
+    it 'should 400 adding a contact using letters', (done) ->
+      sqlService.accounts.createNewAccount genString(), genString()
+      .then (user1) ->
+        request root
+        .post "/user/#{user1.id}/contacts"
+        .send number:"wddsd"
+        .end (err, res) ->
+          throw err if err
+          res.status.should.equal 400
+          done()
+      
+    it 'should 400 adding a contact with an empty string', (done) ->
+      sqlService.accounts.createNewAccount genString(), genString()
+      .then (user1) ->
+        request root
+        .post "/user/#{user1.id}/contacts"
+        .send number:""
+        .end (err, res) ->
+          throw err if err
+          res.status.should.equal 400
+          done()
+      
+    it 'should 400 adding a contact with an empty object', (done) ->
+      sqlService.accounts.createNewAccount genString(), genString()
+      .then (user1) ->
+        request root
+        .post "/user/#{user1.id}/contacts"
+        .send number:null
+        .end (err, res) ->
+          throw err if err
+          res.status.should.equal 400
           done()
     
     it 'should return the list of contacts for a user', (done) ->
@@ -150,6 +208,58 @@ describe 'api', ->
           res.body.should.be.a 'array'
           res.body.should.be.empty
           done()
+
+    it 'should retrive a contact for a user', (done) ->
+      Promise.join (sqlService.accounts.createNewAccount genString(), genString()), (sqlService.accounts.createNewAccount genString(), genString())
+      .then (users) ->
+        [user1, user2] = users
+        sqlService.contacts.addContactNumberToUser user1.id, user2.number
+        .then (contact) ->
+          request root
+          .get "/user/#{user1.id}/contacts/#{contact.id}"
+          .end (err, res) ->
+            throw err if err
+            res.status.should.equal 200
+            expect(Joi.validate(res.body, schemas.ContactSchema).error).to.be.null
+            done()
+
+    it 'should 404 retrieving a contact that does not exist', (done) ->
+      Promise.join (sqlService.accounts.createNewAccount genString(), genString()), (sqlService.accounts.createNewAccount genString(), genString())
+      .then (users) ->
+        [user1, user2] = users
+        sqlService.contacts.addContactNumberToUser user1.id, user2.number
+        .then (contact) ->
+          request root
+          .get "/user/#{user1.id}/contacts/9999"
+          .end (err, res) ->
+            throw err if err
+            res.status.should.equal 404
+            done()
+
+    it 'should 404 retrieving a contact for a user that does not exist', (done) ->
+      Promise.join (sqlService.accounts.createNewAccount genString(), genString()), (sqlService.accounts.createNewAccount genString(), genString())
+      .then (users) ->
+        [user1, user2] = users
+        sqlService.contacts.addContactNumberToUser user1.id, user2.number
+        .then (contact) ->
+          request root
+          .get "/user/9999/contacts/#{contact.id}"
+          .end (err, res) ->
+            throw err if err
+            res.status.should.equal 404
+            done()
+
+    it 'should 404 retrieving a contact that does not belong to a user', (done) ->
+      Promise.join (sqlService.accounts.createNewAccount genString(), genString()), (sqlService.accounts.createNewAccount genString(), genString())
+      .then (users) ->
+        [user1, user2] = users
+        request root
+        .get "/user/#{user1.id}/contacts/1"
+        .end (err, res) ->
+          throw err if err
+          res.status.should.equal 404
+          done()
+
   describe 'Messages', ->
     it 'should be able to send a message to a contact', (done) ->
       Promise.join (sqlService.accounts.createNewAccount genString(), genString()), (sqlService.accounts.createNewAccount genString(), genString())
@@ -201,7 +311,7 @@ describe 'api', ->
           throw err if err
           res.status.should.equal 404
           done()
-
+    
     it 'should 404 sending to a contact that does not exist', (done) ->
       Promise.join (sqlService.accounts.createNewAccount genString(), genString()), (sqlService.accounts.createNewAccount genString(), genString())
       .then (users) ->

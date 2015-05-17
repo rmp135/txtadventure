@@ -47,16 +47,35 @@ internals =
           attributes:['id','number']
         .then (contact) ->
           if not contact then resolve null else resolve contact.toJSON()
-          
+    
+    contactNumberBelongsToUser: (userId, number) ->
+      return new Promise (resolve, reject) ->
+        context.models.Contact.count
+          where:
+            number:number
+            UserId:userId
+          attributes:[]
+        .then (count) ->
+          resolve count isnt 0
+    
     contactBelongsToUser: (userId, contactId) ->
       return new Promise (resolve, reject) ->
         context.models.Contact.count
           where:
             id:contactId
             UserId:userId
-          attributes:['id','number']
+          attributes:[]
         .then (count) ->
           resolve count isnt 0
+
+    findById: (contactId) ->
+      return new Promise (resolve, reject) ->
+        context.models.Contact.find
+          where:
+            id:contactId
+          attributes:['id','number']
+        .then (contact) ->
+          if not contact then resolve null else resolve contact.toJSON()
         
   accounts:
     createNewAccount: (number, pin) ->

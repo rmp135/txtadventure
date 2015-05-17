@@ -5,9 +5,8 @@ div#navbar
   div.navsection.aligncenter
     span Messages
   div.navsection.alignright
-div#content.scrollable
-  div#messageslist
-    ul
-      a(ng-repeat="c in conversations" ui-sref="messagesdetail({id:c.Contact.id, Contact:c.Contact.number})")
-          li{{c.Contact.number}}<br />{{c.LastMessage}}
-            i.fa.fa-arrow-right.alignright
+div#messageslist.content-view.scrollable
+  ul
+    a(ng-repeat="c in conversations" ui-sref="messagesdetail({id:c.Contact.id, Contact:c.Contact.number})")
+        li{{c.Contact.number}}<br />{{c.LastMessage}}
+          i.fa.fa-arrow-right.alignright

@@ -4,14 +4,22 @@ div#navbar
       i.fa.fa-arrow-left
   div.navsection.aligncenter
     span Contacts
-  div.navsection
-div#content.scrollable
-  div#contactslist
+  div.navsection.alignright
+    i.fa(ng-class="{'fa-times':adding, 'fa-plus':!adding}" ng-click="toggleAdd()")
+div#contactslistview.content-view
+  #contact-add(ng-show="adding")
+    form(name = 'contactForm' ng-submit="addContact()")
+      span
+        input(type="text" ng-model="number")
+      span#confirm-entry
+        button(type="submit" ng-disabled="checkForm()")
+          i.fa.fa-check-circle-o
+  div#contactslist.scrollable(ng-class="{'shorten':adding}")
     ul
-      li(ng-repeat="s in contacts")
-        span {{s.number}}
+      li(ng-repeat="contact in contacts")
+        span {{contact.number}}
         span#buttons
-          a(ui-sref="messagesdetail({id:s.id})")
+          a(ui-sref="messagesdetail({id:contact.id})")
               i.fa.fa-comment
-          a(ui-sref="phone({number:s.number})")
+          a(ui-sref="phone({number:contact.number})")
             i.fa.fa-phone

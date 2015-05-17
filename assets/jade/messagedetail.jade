@@ -6,8 +6,8 @@ div#navbar
     span {{contact.number}}
   div.navsection.alignright
 div#messagedetail.content-view
-  div.scrollable.content-view
-    ul.scrollable
+  div#messages.scrollable
+    ul
       li(ng-repeat="c in conversation")
         div.message(message="c"){{c.message}}
   div#messageentry

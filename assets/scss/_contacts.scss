@@ -1,19 +1,44 @@
-#contactslist {
-    ul {
-        li:first-child {
-            border-top:none;
+#contactslistview{
+    #contact-add {
+        box-shadow: teal 0.1rem 0.1rem 0.2rem;
+        padding:1rem;
+        #confirm-entry {
+            float:right;
+            padding-right: 25px;
         }
-        li {
-            padding: 25px;
-            border-bottom:grey 1px solid;
-            // cursor:pointer;
-            #buttons {
-                float: right;
-                * {
-                    padding-right:25px;
-                }
-                *:last-child {
-                    padding-right:0px;
+        button:enabled {
+            color:green;
+        }
+        button {
+            cursor:pointer;
+            background:none;
+            border:none;
+            i {
+                font-size:1.5rem;
+            }
+        }
+    }
+    #contactslist.shorten {
+        height:27rem !important;
+    }
+    #contactslist {
+        height:inherit;
+        ul {
+            li:first-child {
+                border-top:none;
+            }
+            li {
+                padding: 25px;
+                border-bottom:grey 1px solid;
+                // cursor:pointer;
+                #buttons {
+                    float: right;
+                    * {
+                        padding-right:25px;
+                    }
+                    *:last-child {
+                        padding-right:0px;
+                    }
                 }
             }
         }

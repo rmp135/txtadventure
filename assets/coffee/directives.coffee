@@ -1,12 +1,12 @@
 angular.module 'app.directives', ['app.services']
-.directive 'inputMask', ->
+.directive 'contactAddDirective', (contactService) ->
   return {
     restrict: 'E'
-    require: 'ngModel'
-    link: (scope, element, attrs, controller) ->
-      console.log inputValue
+    replace:true
+    templateUrl:'views/contactAddDirective.html'
+    link: ($scope, el, attrs) ->
+      console.log 'contactAddDirective initialised'
   }
-  
 .directive 'message', (phoneService)->
     {
         restrict:'A'

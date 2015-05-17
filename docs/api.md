@@ -17,7 +17,7 @@ Creates a new user with a given number and pin. The number must be 11 digits lon
 
     {session}
     
-#### Request Codes
+#### Response Codes
 
 `400 - Number missing.`
 
@@ -38,7 +38,7 @@ Retrieves the details of a user.
 
     {id, number}
 
-#### Request Codes
+#### Response Codes
 
 `404 - User not found.`
 
@@ -50,7 +50,7 @@ Updates a user with new details. See adding user for more details.
 
     {number, pin}
 
-#### Request Codes
+#### Response Codes
 
 `404 - User not found.`
 
@@ -85,6 +85,23 @@ Adds a new contact to user with id `userid`.
     {id, number}
 
 ---
+
+## /user/:userid/contacts/:conid
+### GET
+
+Retrives information about the contact with id `conid` for user with id `userid`.
+
+#### Response Body
+
+    {id, number}
+    
+#### Response Codes
+
+`404 - User not found`
+
+`404 - Contact not found`
+
+`409 - Contact already exists`
 
 ## /user/:userid/messages
 ### GET

@@ -7,9 +7,11 @@ angular.module 'app.services', ['app.resources']
     @sendMessageToContact = (contactId, message) ->
         Conversation.save({userid:phoneService.currentUser.id, contactId:contactId},{message:message})
     return @
-.factory 'contactService', (Contact) ->
+.factory 'contactService', (phoneService, Contact) ->
     @getContacts = ->
         Contact.query id:1
+    @addContact = (number) ->
+        Contact.save id:phoneService.currentUser.id, {number}
     return @
 .factory 'phoneService', ->
     @currentUser = {id:1, number:"001"}

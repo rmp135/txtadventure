@@ -37,8 +37,8 @@ angular.module 'app', ['ui.router', 'ngAnimate', 'app.controllers', 'app.filters
       resolve:
         conversation: ($stateParams, messageService) ->
           messageService.getMessagesInConversation($stateParams.id).$promise
-        contact: ($stateParams, User) ->
-          User.get id:$stateParams.id
+        contact: ($stateParams, phoneService, Contact) ->
+          Contact.get id:phoneService.currentUser.id, contactId:$stateParams.id
     .state 'terminal',
       url: '/terminal'
       controller: 'TerminalController'
