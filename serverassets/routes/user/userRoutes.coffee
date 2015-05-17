@@ -7,7 +7,7 @@ Promise = require 'bluebird'
 sqlService = require 'sqlService'
 schemas = require 'schemas'
 userMessagesRoutes = require './messages/userMessagesRoutes.js'
-userContactRoutes = require './contacts/userContactRoutes.js'
+userContactRoutes = require './contacts/userContactsRoutes.js'
 
 router.param 'userid', (req, res, next, userid) ->
   sqlService.accounts.findById userid

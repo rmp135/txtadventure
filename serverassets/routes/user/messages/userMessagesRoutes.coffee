@@ -13,8 +13,7 @@ router.param 'conid', (req, res, next, conid) ->
 
 router.route '/'
 .get (req,res) ->
-  console.log 'this is the user messages'
-  sqlService.messages.getConversationsForUser req.params.id
+  sqlService.messages.getConversationsForUser req.params.userid
   .then (conversations) ->
       res.json conversations
 

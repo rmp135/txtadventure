@@ -15,6 +15,7 @@ genNumber = ->
   tail = Math.round(Math.random()*Math.pow(10,8))
   '077' + if tail > Math.pow(10,7) then tail else '0'+tail
 
+createAccount = -> sqlService.accounts.createNewAccount genNumber(), genNumber()
 
 module.exports = describe 'UserMessagesRoutesTests', ->
   describe 'Creating', ->
@@ -110,8 +111,33 @@ module.exports = describe 'UserMessagesRoutesTests', ->
             done()
     
   describe 'Reading', ->
+    
+    it 'shold show message headers for a user that has contacts', (done) ->
+      Promise.join createAccount(), createAccount(), createAccount()
+      .then (users) ->
+        [user1, user2, user3] = users
+        Promise.join (sqlService.contacts.addContactNumberToUser user1.id, user2.number), (sqlService.contacts.addContactNumberToUser user1.id, user3.number)
+        .then (contacts) ->
+          request root
+          .get "/user/#{user1.id}/messages"
+          .end (err, res) ->
+            throw err if err
+            res.body.length.should.equal 2
+            done()
+      
+    
+    it 'should show no message headers if a user has no contacts', (done) ->
+      createAccount()
+      .then (user) ->
+        request root
+        .get "/user/#{user.id}/messages"
+        .end (err, res) ->
+          throw err if err
+          res.body.length.should.equal 0
+          done()
+      
+    
     it 'should not show messages from other contacts', (done) ->
-      createAccount = -> sqlService.accounts.createNewAccount genNumber(), genNumber()
       Promise.join createAccount(), createAccount(), createAccount()
       .then (users) ->
         [user1, user2, user3] = users
