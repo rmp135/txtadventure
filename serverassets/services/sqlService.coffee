@@ -2,10 +2,10 @@ context = require("../models")
 debug = require("debug") "txtAdventure:sqlService"
 _ = require "lodash"
 Promise = require "bluebird"
-securityService = require './securityService.js'
+
+securityService = require 'securityService'
 
 internals = {}
-
 
 internals = 
   selectFromView: (viewname, where) ->

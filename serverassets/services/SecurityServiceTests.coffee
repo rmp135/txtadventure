@@ -1,7 +1,7 @@
 chai = require "chai"
 chai.should()
 
-securityService = require '../../server/services/securityService.js'
+securityService = require 'securityService'
 
 module.exports = describe 'SecurityService', ->
   it 'should salt a username and password combination', (done) ->

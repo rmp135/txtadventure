@@ -1,11 +1,11 @@
 express = require 'express'
 router = express.Router()
-sqlService = require '../../services/sqlService.js'
-schemas = require '../../schemas.js'
 validate = require "express-validation"
 debug = require("debug") "txtAdventure:routes"
 Promise = require 'bluebird'
 
+sqlService = require 'sqlService'
+schemas = require 'schemas'
 userMessagesRoutes = require './messages/userMessagesRoutes.js'
 userContactRoutes = require './contacts/userContactRoutes.js'
 

@@ -1,9 +1,10 @@
 express = require 'express'
 router = express.Router mergeParams:true
-sqlService = require '../../../services/sqlService.js'
-schemas = require '../../../schemas.js'
 validate = require "express-validation"
 Promise = require 'bluebird'
+
+sqlService = require 'sqlService'
+schemas = require 'schemas'
 
 router.param 'conid', (req, res, next, conid) ->
   sqlService.contacts.contactBelongsToUser req.params.userid, conid

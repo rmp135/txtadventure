@@ -3,10 +3,10 @@ chai.should()
 expect = chai.expect
 Promise = require 'bluebird'
 Joi = require "joi"
-schemas = require('../../server/schemas.js')
 
-context = require('../../server/models')
-sqlService = require '../../server/services/sqlService.js'
+schemas = require 'schemas'
+context = require 'models'
+sqlService = require 'sqlService'
 
 genNumber = ->
   tail = Math.round(Math.random()*Math.pow(10,8))

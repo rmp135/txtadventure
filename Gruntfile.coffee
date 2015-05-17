@@ -1,9 +1,10 @@
 module.exports = (grunt) ->
-    grunt.loadNpmTasks('grunt-contrib-coffee')
-    grunt.loadNpmTasks('grunt-contrib-watch')
-    grunt.loadNpmTasks('grunt-contrib-jade')
-    grunt.loadNpmTasks('grunt-contrib-sass')
+    grunt.loadNpmTasks 'grunt-contrib-coffee'
+    grunt.loadNpmTasks 'grunt-contrib-watch'
+    grunt.loadNpmTasks 'grunt-contrib-jade'
+    grunt.loadNpmTasks 'grunt-contrib-sass'
     grunt.loadNpmTasks 'grunt-mocha-test'
+    grunt.loadNpmTasks 'grunt-named-modules'
     
     grunt.registerTask('default','watch')
     grunt.registerTask 'test', 'mochaTest'
@@ -70,5 +71,10 @@ module.exports = (grunt) ->
             scss:
                 files:'assets/scss/*.scss'
                 tasks:['sass']
+            namedModules:
+                files: ['package.json']
+                tasks: ['namedModules']
+                options:
+                    spawned:false
     )
     return
