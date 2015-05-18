@@ -29,4 +29,9 @@ router.get '/:conid', (req, res) ->
   .then (contact) ->
     res.send contact
 
+router.delete '/:conid', (req, res) ->
+  sqlService.contacts.deleteContact req.params.conid
+  .then ->
+    res.sendStatus 200
+
 module.exports = router

@@ -23,3 +23,5 @@ div#contactslistview.content-view
               i.fa.fa-comment
           a(ui-sref="phone({number:contact.number})")
             i.fa.fa-phone
+          a(ng-click="deleteContact($index)")
+            i.fa.fa-trash

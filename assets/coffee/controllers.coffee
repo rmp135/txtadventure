@@ -40,7 +40,14 @@ angular.module 'app.controllers', ['app.services', 'app.directives']
   console.log 'contacts initialised'
   $scope.adding = false
   $scope.contacts = contacts
-
+  
+  
+  $scope.deleteContact = (index) ->
+    contactService.removeContactWithId $scope.contacts[index].id
+    .$promise
+    .then ->
+      $scope.contacts.splice index, 1
+      
   $scope.checkForm = ->
     return /^\d+$/.exec($scope.number) is null
 

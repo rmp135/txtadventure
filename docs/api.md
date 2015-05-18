@@ -19,6 +19,8 @@ Creates a new user with a given number and pin. The number must be 11 digits lon
     
 #### Response Codes
 
+`200 - OK`
+
 `400 - Number missing.`
 
 `400 - PIN missing.`
@@ -51,6 +53,8 @@ Updates a user with new details. See adding user for more details.
     {number, pin}
 
 #### Response Codes
+
+`200 - OK`
 
 `404 - User not found.`
 
@@ -97,11 +101,26 @@ Retrives information about the contact with id `conid` for user with id `userid`
     
 #### Response Codes
 
+`200 - OK`
+
 `404 - User not found`
 
 `404 - Contact not found`
 
 `409 - Contact already exists`
+
+### DELETE
+
+Deletes a contact with id `conid` from user with id `userid`.
+
+#### Response Codes
+
+`200 - OK`
+
+`404 - User not found`
+
+`404 - Contact not found`
+
 
 ## /user/:userid/messages
 ### GET
@@ -113,6 +132,8 @@ Returns a list of conversation headers for a user with the id `nuserid`. Each co
     [{Contact:{id, number}, LastMessage}...]
 
 #### Response Codes
+
+`200 - OK`
 
 `404 - User not found.`
 
@@ -128,6 +149,8 @@ Returns a list of messages that occured between the user of id `userid` and cont
     [{to, from, time, message}...]
 
 #### Response Codes
+
+`200 - OK`
 
 `404 - User does not exist.`
 

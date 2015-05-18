@@ -20,6 +20,13 @@ internals =
     query += ";"
     context.query query
   contacts:
+    
+    deleteContact: (contactId) ->
+      return new Promise (resolve, reject) ->
+        context.models.Contact.destroy where:id:contactId
+        .then ->
+          resolve()
+    
     addContactNumberToUser: (userId, number) ->
       return new Promise (resolve, reject) ->
         context.models.Contact.create UserId:userId, number:number

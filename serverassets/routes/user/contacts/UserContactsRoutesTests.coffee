@@ -16,6 +16,8 @@ genNumber = ->
   tail = Math.round(Math.random()*Math.pow(10,8))
   '077' + if tail > Math.pow(10,7) then tail else '0'+tail
 
+createNewAccount = -> sqlService.accounts.createNewAccount genNumber(), genNumber()
+
 module.exports = describe 'UserContactsRoutesTests', ->
   describe 'Creating', ->
     it 'should 404 adding to a contact where the user does not exist', (done) ->
@@ -172,3 +174,41 @@ module.exports = describe 'UserContactsRoutesTests', ->
           throw err if err
           res.status.should.equal 404
           done()
+
+  describe 'Deleting', ->
+    it 'should allow a user to delete a contact', (done) ->
+      Promise.join createNewAccount(), createNewAccount()
+      .then (users) ->
+        [user1, user2] = users
+        sqlService.contacts.addContactNumberToUser user1.id, user2.number
+        .then (contact) ->
+          request root
+          .delete "/user/#{user1.id}/contacts/#{contact.id}"
+          .end (err, res) ->
+            throw err if err
+            res.status.should.equal 200
+            done()
+        
+    it 'should 404 deleting a contact if the user does not exist', (done) ->
+      request root
+      .delete "/user/9999/contacts/1"
+      .end (err, res) ->
+        throw err if err
+        res.status.should.equal 404
+        done()
+      
+    it 'should 404 deleting a contact if the contact does not exist', (done) ->
+      request root
+      .delete "/user/1/contacts/99999"
+      .end (err, res) ->
+        throw err if err
+        res.status.should.equal 404
+        done()
+      
+    it 'should 404 deleting a contact if the contact does not belong to the user', (done) ->
+      request root
+      .delete "/user/1/contacts/4"
+      .end (err, res) ->
+        throw err if err
+        res.status.should.equal 404
+        done()

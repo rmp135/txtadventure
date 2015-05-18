@@ -12,6 +12,8 @@ angular.module 'app.services', ['app.resources']
         Contact.query id:1
     @addContact = (number) ->
         Contact.save id:phoneService.currentUser.id, {number}
+    @removeContactWithId = (conid) ->
+        Contact.delete id:phoneService.currentUser.id, contactId:conid
     return @
 .factory 'phoneService', ->
     @currentUser = {id:1, number:"001"}

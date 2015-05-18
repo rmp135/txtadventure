@@ -121,6 +121,25 @@ module.exports = describe 'SQLService', ->
               contacts[1].id.should.exist
               contacts[1].number.should.equal "077547575318"
               done()
+
+      it 'should be able to delete a contact', (done) ->
+        Promise.join (sqlService.accounts.createNewAccount genNumber(), genNumber()), (sqlService.accounts.createNewAccount genNumber(), genNumber())
+        .then (users) ->
+          [user1, user2] = users
+          sqlService.contacts.addContactNumberToUser user1.id, user2.number
+          .then ->
+            sqlService.contacts.addContactNumberToUser user1.id, "077547575318"
+          .then (contact) ->
+            sqlService.contacts.deleteContact contact.id
+            .then ->
+              sqlService.contacts.getContactsForUser user1.id
+              .then (contacts) ->
+                expect(Joi.validate(contacts, schemas.ContactListSchema).error).to.be.null
+                contacts.length.should.equal(1)
+                contacts[0].id.should.equal.exist
+                contacts[0].number.should.equal user2.number
+                done()
+        
     
     describe 'Messaging', ->
       it 'should display conversations for a user', (done) ->
