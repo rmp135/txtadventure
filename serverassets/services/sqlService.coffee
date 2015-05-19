@@ -2,6 +2,7 @@ context = require("../models")
 debug = require("debug") "txtAdventure:sqlService"
 _ = require "lodash"
 Promise = require "bluebird"
+bcyrpt = require 'bcrypt'
 
 securityService = require 'securityService'
 
@@ -19,8 +20,32 @@ internals =
     
     query += ";"
     context.query query
+  
+  sessions:
+    createSessionForUserId: (userId) ->
+      return new Promise (resolve, reject) ->
+        bcyrpt.genSalt 5, (err, salt) ->
+          context.models.Session.create
+            UserId:userId
+            token:salt
+          .then (session) ->
+            resolve id:session.id, token:session.token
+
+    findByUserId: (userId) ->
+      return new Promise (resolve, reject) ->
+        context.models.Session.find
+          where: UserId:userId
+        .then (session) ->
+          if not session then resolve null else resolve session.toJSON()
+
+    deleteForUserId: (userId) ->
+      return new Promise (resolve, reject) ->
+        context.models.Session.destroy
+          where: UserId:userId
+        .then ->
+          resolve()
+
   contacts:
-    
     deleteContact: (contactId) ->
       return new Promise (resolve, reject) ->
         context.models.Contact.destroy where:id:contactId
@@ -93,7 +118,7 @@ internals =
         .then (hash) ->
           context.models.User.create number:number, passHash:hash
         .then (user) ->
-          resolve id: user.dataValues.id, number:user.dataValues.number
+          resolve id:user.dataValues.id, number:user.dataValues.number
 
     findByNumber: (number) ->
       return new Promise (resolve, reject) ->
@@ -102,7 +127,7 @@ internals =
         ,
           attributes: ['id','number']
         .then (user) ->
-          if user then resolve user.dataValues else resolve null
+          if user then resolve id:user.dataValues.id, number:user.dataValues.number else resolve null
   
     findById: (id) ->
       return new Promise (resolve, reject) ->
@@ -113,6 +138,20 @@ internals =
             ['id','number']
         .then (user) ->
           if user then resolve user.dataValues else resolve null
+    
+    findBySessionToken: (sessionToken) ->
+      return new Promise (resolve, reject) ->
+        context.models.User.find
+          include:
+            [
+              model:context.models.Session
+              as:'Sessions'
+              where:
+                token:sessionToken
+            ]
+          attributes:['id','number']
+        .then (user) ->
+          if user then resolve id:user.id, number:user.number else resolve null
       
     isAuthed: (number, password) ->
       return new Promise (resolve, reject) ->
@@ -121,7 +160,7 @@ internals =
             number:number
           attributes:['passHash']
         .then (user) ->
-          return reject('User not found.') if not user
+          return resolve false if not user
           resolve (securityService.isAuthed password, user.passHash)
 
   messages:

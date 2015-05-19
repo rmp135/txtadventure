@@ -5,26 +5,34 @@ expect = chai.expect
 Promise = require 'bluebird'
 request = require "supertest"
 Joi = require "joi"
-schemas = require('../../../server/schemas.js')
 
-sqlService = require '../../../server/services/sqlService.js'
-securityService = require '../../../server/services/securityService.js'
+testHelper = require 'testHelper'
+schemas = require 'schemas'
+sqlService = require 'sqlService'
+securityService = require 'securityService'
 
 root = "http://localhost:#{process.env.PORT}/api"
 
-genNumber = ->
-  tail = Math.round(Math.random()*Math.pow(10,8))
-  '077' + if tail > Math.pow(10,7) then tail else '0'+tail
-
-
 module.exports = describe 'UserRoutesTests', ->
   describe 'Creating', ->
+    it 'should 409 if the number already exists', (done) ->
+      number = testHelper.genNumber()
+      sqlService.accounts.createNewAccount number, 'password'
+      .then ->
+        request root
+        .post '/user'
+        .send number:number, pin:'password'
+        .endAsync()
+      .then (res) ->
+        res.status.should.equal 409
+        done()
+      
     it 'should not allow adding a user with no number', (done) ->
       request root
       .post '/user'
       .send pin:"223"
-      .end (err, res) ->
-        throw err if err
+      .endAsync()
+      .then (res) ->
         res.status.should.equal 400
         done()
         
@@ -32,8 +40,8 @@ module.exports = describe 'UserRoutesTests', ->
       request root
       .post '/user'
       .send number:"09",pin:"0293"
-      .end (err, res) ->
-        throw err if err
+      .endAsync()
+      .then (res) ->
         res.status.should.equal 400
         done()
         
@@ -41,17 +49,17 @@ module.exports = describe 'UserRoutesTests', ->
       request root
       .post '/user'
       .send number:"09982736273"
-      .end (err, res) ->
-        throw err if err
-        res.status.should.equal(400)
+      .endAsync()
+      .then (res) ->
+        res.status.should.equal 400
         done()
         
     it 'should not allow adding a user with a too short pin', (done) ->
       request root
       .post '/user'
       .send number:"09876782736", pin:"98"
-      .end (err, res) ->
-        throw err if err
+      .endAsync()
+      .then (res) ->
         res.status.should.equal 400
         done()
     
@@ -59,29 +67,46 @@ module.exports = describe 'UserRoutesTests', ->
       request root
       .post '/user'
       .send number:"07782738273", pin:"09334"
-      .end (err, res) ->
-        throw err if err
+      .endAsync()
+      .then (res) ->
+        res.status.should.equal 200
         expect(Joi.validate(res.body, schemas.ContactSchema).error).to.be.null
         done()
   
   describe 'Reading', ->
-    it 'should return a user by id', (done) ->
-      sqlService.accounts.createNewAccount genNumber(), genNumber()
-      .then (user) ->
+    it 'should return a user by id if the user is authorised', (done) ->
+      testHelper.login()
+      .then (loginDetails) ->
+        {user, session} = loginDetails
         request root
         .get "/user/#{user.id}"
-        .end (err, res) ->
-          throw err if err
-          expect(Joi.validate(res.body, schemas.ContactSchema).error).to.be.null
-          done()
-    
-    it 'should 404 returning a user that does not exist', (done) ->
-      request root
-      .get "/user/222/contacts"
-      .end (err, res) ->
-        throw err if err
-        res.status.should.equal 404
+        .setSession session
+        .endAsync()
+      .then (res) ->
+        res.status.should.equal 200
+        expect(Joi.validate(res.body, schemas.ContactSchema).error).to.be.null
         done()
+    
+    it 'should 403 returning a user when not authorised', (done) ->
+      testHelper.login()
+      .then (loginDetails) ->
+        {user, session} = loginDetails
+        request root
+        .get "/user/1"
+        .setSession session
+        .endAsync()
+      .then (res) ->
+        res.status.should.equal 403
+        done()
+          
+    it 'should 403 returning a user when no cookie is set', (done) ->
+      request root
+      .get "/user/1"
+      .endAsync()
+      .then (res) ->
+        res.status.should.equal 403
+        done()
+        
     
   describe.skip 'Updating', ->
     it 'should 404 updating a user that does not exist', (done) ->

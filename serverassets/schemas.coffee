@@ -34,4 +34,19 @@ UserCreateSchema = Joi.object().keys(
 
 ContactListSchema = Joi.array().items(ContactSchema)
 
-module.exports = {ContactSchema, ConversationSchema, ConversationListSchema, MessageSchema, UserCreateSchema, ContactListSchema, NewMessageSchema, ContactAddSchema}
+SessionSchema = Joi.object().keys(
+  id: Joi.number().required()
+  token: Joi.string().required()
+  )
+
+module.exports = {
+  ContactSchema
+  ConversationSchema
+  ConversationListSchema
+  MessageSchema
+  UserCreateSchema
+  ContactListSchema
+  NewMessageSchema
+  ContactAddSchema
+  SessionSchema
+}

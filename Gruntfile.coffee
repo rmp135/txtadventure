@@ -6,8 +6,9 @@ module.exports = (grunt) ->
     grunt.loadNpmTasks 'grunt-mocha-test'
     grunt.loadNpmTasks 'grunt-named-modules'
     
-    grunt.registerTask('default','watch')
+    grunt.registerTask 'default','watch'
     grunt.registerTask 'test', 'mochaTest'
+    grunt.registerTask 'transpile', 'coffee'
     grunt.initConfig(
         mochaTest:
             test:

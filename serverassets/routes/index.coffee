@@ -8,6 +8,7 @@ schemas = require 'schemas'
 sqlService = require 'sqlService'
 
 userRoutes = require './user/userRoutes.js'
+sessionRoutes = require './session/sessionRoutes.js'
 
 logResponseBody = (req, res, next) ->
   oldWrite = res.write
@@ -36,13 +37,8 @@ router.use (req, res, next) ->
   debug "Request: #{JSON.stringify req.body}"
   next()
 
-router.route '/login'
-.post (req, res) ->
-    sqlService.accounts.findById req.body.id
-    .then (user) ->
-        if not user
-            res.sendStatus 403
 
+router.use '/', sessionRoutes
 router.use '/user', userRoutes
 
 module.exports = router;
