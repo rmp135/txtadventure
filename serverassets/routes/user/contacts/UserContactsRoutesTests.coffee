@@ -109,6 +109,24 @@ module.exports = describe 'UserContactsRoutesTests', ->
         expect(Joi.validate(res.body, schemas.ContactListSchema).error).to.be.null
         done()
     
+    it 'should 403 when returning contacts if the session is not available', (done) ->
+        request root
+        .get "/user/1/contacts/"
+        .set 'Cookie', 'session=222'
+        .endAsync()
+        .then (res) ->
+          res.status.should.equal 403
+          done()
+
+    it 'should 403 when returning a contact if the session is not available', (done) ->
+        request root
+        .get "/user/1/contacts/1"
+        .set 'Cookie', 'session=222'
+        .endAsync()
+        .then (res) ->
+          res.status.should.equal 403
+          done()
+
     it 'should 403 returning the list of contacts for a user that does not exist', (done) ->
       request root
       .get "/user/9999/contacts/"
@@ -200,6 +218,15 @@ module.exports = describe 'UserContactsRoutesTests', ->
       .then (res) ->
         res.status.should.equal 200
         done()
+
+    it 'should 403 when deleting a contact if the session is not available', (done) ->
+        request root
+        .get "/user/1/contacts/1"
+        .set 'Cookie', 'session=222'
+        .endAsync()
+        .then (res) ->
+          res.status.should.equal 403
+          done()
         
     it 'should 403 deleting a contact if the user does not have permission', (done) ->
       request root

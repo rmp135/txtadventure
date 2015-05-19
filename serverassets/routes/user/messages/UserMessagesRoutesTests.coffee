@@ -60,8 +60,18 @@ module.exports = describe 'UserMessagesRoutesTests', ->
     it 'should 403 sending from an account that the user is not authenticated for', (done) ->
       request root
       .post "/user/1/messages/1"
-      .send message:"test message"
       .setSession session
+      .send message:"test message"
+      .endAsync()
+      .then (res) ->
+        res.status.should.equal 403
+        done()
+
+    it 'should 403 when sending a message if the session is not available', (done) ->
+      request root
+      .post "/user/1/messages/1"
+      .send message:"test message"
+      .set 'Cookie', 'session=222'
       .endAsync()
       .then (res) ->
         res.status.should.equal 403

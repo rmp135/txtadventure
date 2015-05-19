@@ -10,10 +10,10 @@ userMessagesRoutes = require './messages/userMessagesRoutes.js'
 userContactRoutes = require './contacts/userContactsRoutes.js'
 
 router.param 'userid', (req, res, next, userid) ->
-  if not req.cookies.session then return res.sendStatus 403
+  if not req.cookies.session or req.cookies.session is '' then return res.sendStatus 403
   sqlService.accounts.findBySessionToken req.cookies.session
   .then (user) ->
-    if user.id isnt +req.params.userid then res.sendStatus 403 else next()
+    if not user or user.id isnt +req.params.userid then res.sendStatus 403 else next()
 
 router.post '/', validate(body:schemas.UserCreateSchema), (req, res) ->
   sqlService.accounts.findByNumber req.body.number
