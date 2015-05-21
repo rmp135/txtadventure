@@ -4,10 +4,20 @@
  * Module dependencies.
  */
 
-var app = require('../app');
+var rootPath;
+if (process.env.ENV === 'production') {
+  rootPath = "../Prod"
+  console.log("Running in production mode.")
+}
+else {
+  rootPath = "../Test"
+  console.log("Running in testing mode.")
+}
+
+var app = require(rootPath+'/app');
 var debug = require('debug')('app');
 var http = require('http');
-var context = require('../server/models')
+var context = require(rootPath+'/server/models/index.js')
 var fs = require('fs');
 /**
  * Get port from environment and store in Express.

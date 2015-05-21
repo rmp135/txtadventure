@@ -1,5 +1,5 @@
 bin/npm-debug.log
 npm-debug.log
-public/*
-server/*
+Prod/*
+Test/*
 db.sqlite3

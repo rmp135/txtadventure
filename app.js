@@ -6,13 +6,14 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var debug = require('debug')('txtAdventure:router')
 
+
 // var routes = require('./server/routes/api/index');
-var apiroutes = require('./server/routes');
+var apiroutes = require('./Prod/server/routes');
 
 var app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, './Prod/server'));
 app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
@@ -36,7 +37,7 @@ app.use(function(req, res, next) {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, './Prod/client')));
 
 app.get('/', function(req, res) {
   res.render('index');

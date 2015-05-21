@@ -3,12 +3,18 @@ module.exports = (grunt) ->
     grunt.loadNpmTasks 'grunt-contrib-watch'
     grunt.loadNpmTasks 'grunt-contrib-jade'
     grunt.loadNpmTasks 'grunt-contrib-sass'
+    grunt.loadNpmTasks 'grunt-contrib-copy'
+    grunt.loadNpmTasks 'grunt-contrib-clean'
+    grunt.loadNpmTasks 'grunt-contrib-uglify'
+    grunt.loadNpmTasks 'grunt-ng-annotate'
     grunt.loadNpmTasks 'grunt-mocha-test'
-    grunt.loadNpmTasks 'grunt-named-modules'
-    
+
     grunt.registerTask 'default','watch'
     grunt.registerTask 'test', 'mochaTest'
-    grunt.registerTask 'transpile', 'coffee'
+    grunt.registerTask 'transpile', ['coffee','sass','jade']
+    grunt.registerTask 'build', ['clean:build',"copy:devToTest", 'transpile','test']
+    grunt.registerTask 'deploy', ['clean:release','copy:testToProd', 'ngAnnotate','uglify']
+    
     grunt.initConfig(
         mochaTest:
             test:
@@ -16,14 +22,14 @@ module.exports = (grunt) ->
                     reporter:'spec'
                     require:'coffee-script/register'
                     bail:true
-                src: ['test/*.coffee']
+                src: ['Dev/tests/tests.coffee']
         sass:
             compile:
                 files: [
                     expand: true
                     src:'*.scss'
-                    dest:'public/css'
-                    cwd:'assets/scss',
+                    dest:'Test/client/css'
+                    cwd:'Dev/clientassets/scss',
                     ext:'.css'
                     ]
         coffee: 
@@ -32,50 +38,63 @@ module.exports = (grunt) ->
                     'test.js': 'test.coffee'
             client:
                 files: 
-                    'public/js/app.js': 'assets/coffee/*.coffee'
+                    'Test/client/js/app.js': 'Dev/clientassets/coffee/*.coffee'
             server:
-                options:
-                    bare:true
                 files: [
                     expand:true
-                    src:'**/*.coffee'
-                    dest:'server'
-                    cwd:'serverassets/'
+                    src:['**/*.coffee','!**/*Tests.coffee',"app.coffee"]
+                    dest:'Test/server/'
+                    cwd:'Dev/serverassets/'
+                    ext:'.js'
+                ,
+                    expand:true
+                    src:['app.coffee']
+                    dest:'Test/'
+                    cwd:'Dev/'
                     ext:'.js'
                     ]
-                    
         jade:
             compile:
                 files: [
                     expand:true
                     src:'*.jade'
-                    dest:'public/views'
-                    cwd:'assets/jade'
+                    dest:'Test/client/views'
+                    cwd:'Dev/clientassets/jade'
                     ext:'.html'
                     ]
+        copy:
+            devToTest:
+                files:[ {expand:true, cwd:"Dev/serverassets",src:["views/*"], dest: "Test/server"},
+                        {expand:true, cwd:"Dev/clientassets", src:["images/*","js/*"], dest:"Test/client"}]
+            testToProd:
+                files: [
+                    expand:true
+                    cwd: "./Test"
+                    src: ["**","!server/*.sqlite3"]
+                    dest: "./Prod/"
+                    ]
+            
+        clean:
+            build:["./Test"]
+            release:["./Prod"]
+            
+        uglify:
+            client:
+                files:
+                    "Prod/client/js/app.js":["Prod/client/js/app.js"]
+        ngAnnotate:
+            options:{}
+            client:
+                files:"Prod/client/js/app.js":["Prod/client/js/app.js"]
         watch:
-            tests:
-                files: ['test/*.coffee']
-                tasks: ['test']
+            build:
+                files: ["./Dev/**/*.*"]
+                tasks:['build']
+                options:
+                    atBegin:true
             test:
                 files: 'test.coffee'
                 tasks:['coffee:test']
-            coffee:
-                files: 'assets/coffee/*.coffee'
-                tasks:['coffee:client']
-            server:
-                files: 'serverassets/**/*.coffee'
-                tasks:['coffee:server', 'test']
-            jade:
-                files:'assets/jade/*.jade'
-                tasks:['jade']
-            scss:
-                files:'assets/scss/*.scss'
-                tasks:['sass']
-            namedModules:
-                files: ['package.json']
-                tasks: ['namedModules']
                 options:
-                    spawned:false
+                    atBegin:true
     )
-    return
