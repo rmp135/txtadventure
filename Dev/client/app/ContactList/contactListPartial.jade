@@ -19,7 +19,7 @@ div#contactslistview.content-view
       li(ng-repeat="contact in contacts")
         span {{contact.number}}
         span#buttons
-          a(ui-sref="messagesdetail({id:contact.id})")
+          a(ui-sref="messagedetail({id:contact.id})")
               i.fa.fa-comment
           a(ui-sref="phone({number:contact.number})")
             i.fa.fa-phone

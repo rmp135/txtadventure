@@ -1,28 +1,10 @@
-angular.module 'app.directives', ['app.services']
-.directive 'contactAddDirective', (contactService) ->
-  return {
-    restrict: 'E'
-    replace:true
-    templateUrl:'views/contactAddDirective.html'
-    link: ($scope, el, attrs) ->
-      console.log 'contactAddDirective initialised'
-  }
-.directive 'message', (phoneService)->
-    {
-        restrict:'A'
-        scope:{message:"="}
-        link: (scope, el, att) ->
-            if phoneService.currentUser.number is scope.message.from
-                el.addClass 'message-right'
-            else
-                el.addClass 'message-left'
-    }
+angular.module 'Terminal'
 .directive 'terminal', ($interval, $timeout) ->
     return {
         restrict:'E'
         transclude:true
         #controller: 'TerminalController'
-        templateUrl: 'views/terminalDirective.html'
+        templateUrl: 'partials/terminalDirectivePartial.html'
         replace:true
         compile: (tElement, tAttrs, transclude) ->
             return {

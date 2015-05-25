@@ -1,4 +1,4 @@
-angular.module 'app.filters', []
+angular.module 'Terminal'
 .filter 'mask', ->
   (input, mask, isEnabled) ->
     isEnabled = if not isEnabled? then true else isEnabled

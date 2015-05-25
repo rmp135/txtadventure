@@ -1,55 +1,7 @@
-@import 'phoneview';
 @import 'navbar';
 @import 'titlebar';
-@import 'contacts';
-@import 'springboard';
-@import 'messageslist';
-@import 'messagedetail';
-@import 'login';
-@import 'terminal';
 
-* {
-    margin: 0;
-    padding: 0;
-    
-}
-input {
-    // -webkit-appearance: none;
-    // border-radius:0;
-    // border:none;
-}
 
-* [ng-click] {
-    cursor:pointer;
-}
-
-a {
-    color:black;
-    text-decoration:none;
-}
-body {
-    background-color:rgb(36,36,36);
-    font-family:'Open Sans', sans-serif;
-    ul {
-        margin:0px;
-        padding:0px;
-        li {
-            list-style-type:none;
-        }
-    }
-}
-.alignright {
-    padding-right:5px;
-    text-align:right;
-}
-.aligncenter {
-    text-align:center;
-}
-.scrollable {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    
-}
 .content-view {
     height:32rem;
     width:inherit;
@@ -93,4 +45,3 @@ body {
         text-align:center;
     }
 }
-
