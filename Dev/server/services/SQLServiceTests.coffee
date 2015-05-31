@@ -8,6 +8,8 @@ schemas = testRequire 'schemas'
 context = testRequire 'models/index.js'
 sqlService = testRequire 'services/sqlService.js'
 
+testHelper = localRequire 'tests/testHelper.coffee'
+
 genNumber = ->
   tail = Math.round(Math.random()*Math.pow(10,8))
   '077' + if tail > Math.pow(10,7) then tail else '0'+tail
@@ -242,3 +244,59 @@ module.exports = describe 'SQLService', ->
             expect(Joi.validate(messages, schemas.ConversationSchema).error).to.be.null
             messages.length.should.equal 1
             done()
+    
+    it 'should show the message on the other account conversataion header', (done) ->
+      Promise.join testHelper.login(), testHelper.login()
+      .then (accountDetails) ->
+        [{user:user1, session:session1}, {user:user2, session:session2}] = accountDetails
+        # Add user2 as a contact to user1 and vis versa.
+        Promise.join (sqlService.contacts.addContactNumberToUser user1.id, user2.number), (sqlService.contacts.addContactNumberToUser user2.id, user1.number)
+        .then (contacts) ->
+          [contact1, contact2] = contacts
+          sqlService.messages.sendMessageToContact user1.id, contact2.id, 'test'
+          .then ->
+            sqlService.messages.getConversationsForUser user2.id
+      .then (conversations) ->
+        expect conversations.length
+        .to.equal 1
+        expect conversations[0].LastMessage
+        .to.equal 'test'
+        done()
+
+    it 'should show the message on the other account', (done) ->
+      Promise.join testHelper.createAccount(), testHelper.createAccount()
+      .then (accounts) ->
+        [user1, user2] = accounts
+        # Add user2 as a contact to user1 and vis versa.
+        Promise.join (sqlService.contacts.addContactNumberToUser user1.id, user2.number), (sqlService.contacts.addContactNumberToUser user2.id, user1.number)
+        .then (contacts) ->
+          [contact1, contact2] = contacts
+          sqlService.messages.sendMessageToContact user1.id, contact1.id, 'test'
+          .then ->
+            sqlService.messages.getConversationBetweenUserAndContact user2.id, contact2.id
+          .then (messages) ->
+            expect messages.length
+            .to.equal 1
+            expect messages[0].message
+            .to.equal 'test'
+            done()
+    
+    it 'should only show a single message header when multiple are sent', (done) ->
+      Promise.join testHelper.login(), testHelper.login()
+      .then (accountDetails) ->
+        [{user:user1, session:session1}, {user:user2, session:session2}] = accountDetails
+        # Add user2 as a contact to user1 and vis versa.
+        Promise.join (sqlService.contacts.addContactNumberToUser user1.id, user2.number), (sqlService.contacts.addContactNumberToUser user2.id, user1.number)
+        .then (contacts) ->
+          [contact1, contact2] = contacts
+          sqlService.messages.sendMessageToContact user1.id, contact2.id, 'test'
+          .then ->
+            sqlService.messages.sendMessageToContact user1.id, contact2.id, 'test2'
+          .then ->
+            sqlService.messages.getConversationsForUser user2.id
+      .then (conversations) ->
+        expect conversations.length
+        .to.equal 1
+        expect conversations[0].LastMessage
+        .to.equal 'test2'
+        done()

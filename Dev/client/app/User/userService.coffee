@@ -7,7 +7,6 @@ angular.module 'User'
     $http.post "/api/login", {number, pin}
     .then (res) ->
       userService.currentUser = id:res.data.id, number:res.data.number
-      console.log 
       res.data
   userService.createUser = (number, pin) ->
     User.save {number, pin}

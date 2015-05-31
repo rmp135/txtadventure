@@ -7,7 +7,6 @@ angular.module 'Session'
     Session.get token:sessionService.currentSession
     .$promise
     .then (res) ->
-      console.log res
       id:res.id, number:res.number
     .catch (res) ->
       return null

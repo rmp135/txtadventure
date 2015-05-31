@@ -150,7 +150,6 @@ module.exports = describe 'SessionRoutesTests', ->
       testHelper.login()
       .then (logindetails) ->
         {user, session} = logindetails
-        console.log session.token
         request root
         .get "/session/#{session.token}"
         .send()

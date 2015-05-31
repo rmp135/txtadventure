@@ -25,7 +25,7 @@ app.use (req, res, next) ->
       status = '\u001b[32m'+status+'\u001b[0m'
     else if status is 304
       status = '\u001b[33m'+status+'\u001b[0m'
-    debug "#{status} #{req.method} http://txtAdventure-rmp135.c9.io #{req.originalUrl}"
+    debug "#{status} #{req.method} http://txtAdventure-rmp135.c9.io#{req.originalUrl}"
   next()
 
 app.use bodyParser.json()

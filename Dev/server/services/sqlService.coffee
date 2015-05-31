@@ -6,9 +6,9 @@ crypto = require 'crypto'
 
 securityService = require '../../../Test/server/services/securityService.js'
 
-internals = {}
+sqlService = {}
 
-internals = 
+sqlService = 
   selectFromView: (viewname, where) ->
     query = "SELECT * FROM "
     if not viewname?
@@ -16,7 +16,7 @@ internals =
   
     query += viewname
     if where?
-      query += ' ' + where
+      query += ' where ' + where
     
     query += ";"
     context.query query
@@ -169,16 +169,7 @@ internals =
   messages:
     getConversationsForUser: (userId) ->
       return new Promise (resolve, reject) ->
-        query = "select c.id ContactId, c.number, IFNULL(m.message, 'No messages.') LastMessage from Contact c LEFT OUTER JOIN (
-                	select * from (
-                		select * from (
-                			select  m.id, m.FromUserId FromUserId, u.id ToUserId, c.id ContactId, m.message, c.number from Message m JOIN Contact c on c.id = m.ToContactId LEFT OUTER JOIN User u on u.number = c.number
-                			UNION ALL
-                			select  m.id, u.id FromUserId, m.FromUserId ToUserId, c.id ContactId, m.message, c.number from Message m JOIN Contact c on c.id = m.ToContactId LEFT OUTER JOIN User u on u.number = c.number
-                		) order by id asc
-                	) where FromUserId = #{userId} GROUP BY ToUserId
-                ) m on m.ContactId = c.id where c.UserId = #{userId}"
-        context.query query
+        sqlService.selectFromView 'getConversationHeaders', "UserId = #{userId} GROUP BY ContactId"
         .then (headers) ->
           resolve _.map headers[0], (header) ->
             return {
@@ -190,33 +181,24 @@ internals =
   
     getConversationBetweenUserAndContact: (userId, contactId) ->
       return new Promise (resolve, reject) ->
-        context.models.Message.findAll
-          where:ToContactId:contactId
-          include: [
-            {model:context.models.User, as:'FromUser', attributes:['number']}
-          ,
-            {model:context.models.Contact, as:'ToContact', attributes:['id','number']}
-          ]
-          attributes:['ToContactId','FromUserId', 'message']
+        sqlService.selectFromView 'getConversationDetails', "FromUserId = #{userId} OR ToUserId = #{userId} AND (ToContactId = #{contactId} OR ToContactId = (SELECT ID FROM Contact WHERE number = `ToContact.number`))"
         .then (results) ->
-          resolve _.map results, (result) ->
-            message = result.toJSON()
+          resolve _.map results[0], (message) ->
             return {
               message:message.message
-              time:message.time
-              from:message.FromUser.number
-              to: message.ToContact.number
+              time:new Date message.time
+              from:message['FromUser.number']
+              to: message['ToContact.number']
             }
     
     sendMessageToContact: (userId, contactId, message) ->
       return new Promise (resolve, reject) ->
         context.models.Message.create {
           message:message,
-          FromUserId:userId,
           ToContactId:contactId,
           time: new Date()
           }
         .then ->
           resolve()
 
-module.exports = internals
+module.exports = sqlService

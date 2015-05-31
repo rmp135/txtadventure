@@ -70,8 +70,8 @@ angular.module 'app', externalModules.concat internalModules
   if sessionService.currentSession and not userService.currentUser
     sessionService.getSessionDetails sessionService.currentSession
     .then (user) ->
-      userService.currentUser = user
-      
+      userService.currentUser = user ? $state.go 'terminal'
+
   $rootScope.$state = $state
   $rootScope.$stateParams = $stateParams
 
