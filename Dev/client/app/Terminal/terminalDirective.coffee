@@ -124,7 +124,7 @@ angular.module 'Terminal'
                     line.textContent = text
                     scrollToTop()
                     $scope.commandLine = ''
-                    $scope.$apply()
+                    $scope.$digest()
                     callback() if callback?
 
                   rescramble = (text, options, callback) ->

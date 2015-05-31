@@ -69,28 +69,34 @@ angular.module 'Terminal'
     "q|quit": ->
       machine.transitionToState 'home'
     otherwise: ->
+      return if $scope.commandLine is ""
       number = $scope.commandLine
+      echo number
       machine.transitionToState "login.password"
   ,
     onEnter: ->
       blink "Enter your phone number. (q) to go back"
   .state 'login.password', 
     otherwise: ->
-      $scope.secret = true
+      return if $scope.commandLine is ""
       pin = $scope.commandLine
+      echo "*".repeat pin.length
       userService.login number, pin
       .then ->
-        $state.go 'springboard'
-      .catch ->
-        blink "An error occured.", ->
-          $scope.secret = false
-          machine.transitionToState 'home'
+        $scope.enabled = false
+        $scope.accessor.echoMultiple ["Accessing secure network...", "Logging in..."],{delay:500}, -> $timeout (-> $state.go('springboard')), 1000
+      .catch (err) ->
+        blink "Number or PIN incorrect.", ->
+          machine.transitionToState 'login'
   ,
     onEnter: ->
       $scope.flashing = false
+      $scope.secret = true
       blink "Enter PIN for this number.", ->
         $scope.flashing = true
-    
+    onExit: ->
+      $scope.secret = false
+      
   
   $timeout ->
     if $scope.accessor?
