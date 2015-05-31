@@ -67,6 +67,7 @@ angular.module 'Terminal'
         
   .state 'login', 
     "q|quit": ->
+      echo $scope.commandLine
       machine.transitionToState 'home'
     otherwise: ->
       return if $scope.commandLine is ""
