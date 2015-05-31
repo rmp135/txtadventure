@@ -62,8 +62,12 @@ angular.module 'app', externalModules.concat internalModules
       controller: 'TerminalController'
       templateUrl: '/partials/terminalPartial.html'
 .run ($rootScope, $state, $stateParams, sessionService, userService) ->
-  $rootScope.$on "$stateChangeStart", (event) ->
-    if not sessionService.currentSession and next.name isnt 'terminal'
+  $rootScope.$on "$stateChangeStart", (event, toState, toParams, fromState, fromParams) ->
+    if fromState.name is "" and toState.name isnt 'springboard' and toState.name isnt 'terminal'
+      event.preventDefault()
+      $state.go 'springboard'
+
+    else if not sessionService.currentSession and toState.name isnt 'terminal'
       event.preventDefault()
       $state.go 'terminal'
     
