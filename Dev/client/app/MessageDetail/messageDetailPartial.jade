@@ -11,6 +11,6 @@ div#messagedetail.content-view
       li(ng-repeat="c in conversation")
         div.message(message="c") {{c.message}}
   div#messageentry
-    input#msgbox(type="text" ng-model="newmessage")
+    input#msgbox(type="text" autocomplete="off" ng-model="newmessage")
     div#sendmsgbtn(ng-click="sendmsg(newmessage)")
       i.fa.fa-send-o

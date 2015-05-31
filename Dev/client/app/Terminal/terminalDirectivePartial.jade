@@ -3,5 +3,5 @@ div#terminal-viewport
   div#input(ng-show='enabled')
     span#prompt > 
     span#text {{commandLine | mask:"*":secret}}
-      input#target(ng-model="commandLine")
+      input#target(type="text" autocomplete="off" autocorrect="off" autocapitalize="off" ng-model="commandLine")
     span#cursor.hidden(ng-show='flashing') _
