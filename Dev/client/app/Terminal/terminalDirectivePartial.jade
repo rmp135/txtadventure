@@ -2,6 +2,6 @@ div#terminal-viewport
   div#output
   div#input(ng-show='enabled')
     span#prompt > 
-    span#text{{commandLine | mask:"*":secret}}
+    span#text {{commandLine | mask:"*":secret}}
       input#target(ng-model="commandLine")
     span#cursor.hidden(ng-show='flashing') _

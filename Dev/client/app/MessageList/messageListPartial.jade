@@ -8,5 +8,5 @@ div#navbar
 div#messagelist.content-view.scrollable
   ul
     a(ng-repeat="c in conversations" ui-sref="messagedetail({id:c.Contact.id, Contact:c.Contact.number})")
-        li{{c.Contact.number}}<br />{{c.LastMessage}}
+        li {{c.Contact.number}}<br />{{c.LastMessage}}
           i.fa.fa-arrow-right.alignright
