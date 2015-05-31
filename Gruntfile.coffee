@@ -13,8 +13,8 @@ module.exports = (grunt) ->
   grunt.registerTask 'default','watch'
   grunt.registerTask 'test', ['mochaTest','karma']
   grunt.registerTask 'transpile', ['coffee','sass','jade']
-  #grunt.registerTask 'build', ['clean:build',"copy:devToTest", 'transpile','test']
-  grunt.registerTask 'build', ['clean:build',"copy:devToTest", 'transpile']
+  grunt.registerTask 'build', ['clean:build',"copy:devToTest", 'transpile','test']
+  #grunt.registerTask 'build', ['clean:build',"copy:devToTest", 'transpile']
   grunt.registerTask 'deploy', ['clean:release','copy:testToProd', 'ngAnnotate','uglify']
   
   grunt.initConfig(
@@ -22,25 +22,27 @@ module.exports = (grunt) ->
       unit:
         options:
           frameworks:['jasmine']
+          reporters:['mocha']
           singleRun:true
           
           browsers:["PhantomJS"]
           files:[
             "http://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.8.0/lodash.min.js"
             "https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0-rc.1/angular.js"
+            'https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0-rc.1/angular-cookies.js'
             'https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0-rc.1/angular-animate.js'
             'https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0-rc.1/angular-resource.js'
             'https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0-rc.1/angular-touch.js'
             "https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.14/angular-ui-router.min.js"
-            "./Test/client/js/*.js",
             "https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0-rc.1/angular-mocks.js"
-            "./Dev/clientassets/tests/*.coffee"
+            "./Test/client/js/app.js"
+            "./Dev/client/**/*Tests.coffee",
             ]
 
           preprocessors:
-            "./Dev/clientassets/tests/*.coffee": ['coffee']
+            "./Dev/client/**/*Tests.coffee": ['coffee']
 
-          logLevel: "OFF"
+          #logLevel: "DEBUG"
 
           coffeePreprocessor:
             options: 
@@ -55,7 +57,7 @@ module.exports = (grunt) ->
           reporter:'spec'
           require:'coffee-script/register'
           bail:true
-        src: ['Dev/tests/tests.coffee']
+        src: ['Dev/server/tests/tests.coffee']
     sass:
       compile:
         files: [
@@ -70,6 +72,8 @@ module.exports = (grunt) ->
         files:
           'test.js': 'test.coffee'
       client:
+        options:
+          join:true
         files: 
           'Test/client/js/app.js': ['Dev/client/app/app.coffee', 'Dev/client/app/**/*.coffee','Dev/client/assets/**/*.coffee','!**/*Tests.coffee']
       server:
@@ -77,7 +81,7 @@ module.exports = (grunt) ->
           expand:true
           src:['**/*.coffee','!**/*Tests.coffee',"app.coffee"]
           dest:'Test/server/'
-          cwd:'Dev/serverassets/'
+          cwd:'Dev/server/'
           ext:'.js'
         ,
           expand:true
@@ -129,4 +133,7 @@ module.exports = (grunt) ->
       test:
         files: 'test.coffee'
         tasks:['coffee:test']
+      clientTests:
+        files: ['./Dev/**/*Tests.coffee']
+        tasks:['karma']
   )

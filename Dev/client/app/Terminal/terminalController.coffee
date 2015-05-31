@@ -1,12 +1,12 @@
 angular.module 'Terminal'
-.controller 'TerminalController', ($timeout, $scope, $state) ->
+.controller 'TerminalController', ($timeout, $scope, $state, userService) ->
   console.log 'terminal initialised'
   $scope.enabled = false
   $scope.flashing = false
   $scope.history = []
   $scope.commandLine = ''
   $scope.secret = false
-  blink = null
+  blink = number = null
   
   echo = (msg) -> $scope.accessor.echo "> #{msg}"
   
@@ -34,13 +34,23 @@ angular.module 'Terminal'
   ,
     onEnter: ->
       $scope.accessor.blink "Enter your command."
+      $scope.enabled = true
     preAction: ->
       echo $scope.commandLine
   .state "join", 
     otherwise: ->
+      pin = $scope.commandLine
       echo "*".repeat $scope.commandLine.length
       $scope.enabled = false
-      $scope.accessor.echoMultiple ["Accessing secure network...", "Logging in..."],{delay:500}, -> $timeout (-> $state.go('springboard')), 1000
+      userService.createUser number, pin
+      .then (user) ->
+        userService.login number, pin
+      .then ->
+        $scope.accessor.echoMultiple ["Accessing secure network...", "Logging in..."],{delay:500}, -> $timeout (-> $state.go('springboard')), 1000
+      .catch ->
+        blink "An error occured.", ->
+          $scope.secret = false
+          machine.transitionToState 'home'
   ,
     onEnter: ->
       $scope.enabled = false
@@ -48,7 +58,8 @@ angular.module 'Terminal'
             tail = Math.round(Math.random()*Math.pow(10,8))
             '077' + if tail > Math.pow(10,7) then tail else '0'+tail
       blink "Generating new number...", ->
-        $scope.accessor.scramble generateNumber(), {digits:"0123456789"}, ->
+        number = generateNumber()
+        $scope.accessor.scramble number, {digits:"0123456789", delay:5}, ->
           blink "Enter a new PIN.", ->
             $scope.flashing = true
             $scope.enabled = true
@@ -58,11 +69,23 @@ angular.module 'Terminal'
     "q|quit": ->
       machine.transitionToState 'home'
     otherwise: ->
+      number = $scope.commandLine
       machine.transitionToState "login.password"
   ,
     onEnter: ->
       blink "Enter your phone number. (q) to go back"
-  .state 'login.password', {},
+  .state 'login.password', 
+    otherwise: ->
+      $scope.secret = true
+      pin = $scope.commandLine
+      userService.login number, pin
+      .then ->
+        $state.go 'springboard'
+      .catch ->
+        blink "An error occured.", ->
+          $scope.secret = false
+          machine.transitionToState 'home'
+  ,
     onEnter: ->
       $scope.flashing = false
       blink "Enter PIN for this number.", ->

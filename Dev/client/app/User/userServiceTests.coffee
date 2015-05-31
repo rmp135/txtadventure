@@ -1,39 +1,74 @@
-#/*global describe */
-#/*global it */
-#/*global expect */
-#/*global beforeEach */
-#/*global angular */
-#(function() {
-  #describe('Services Test', function() {
-#
-    #var titleService;
-#
-    #beforeEach(function() {
-      #angular.module('testApp');
-    #});
-#
-    #beforeEach(inject(function() {
-      #var $injector = angular.injector(['testApp']);
-      #titleService = $injector.get('titleService');
-    #}));
-#
-    #it('is very true', function(){
-        #titleService.setTitles('title', 'subtitle', 'pageTitle', 'pageSubtitle');
-#
-      #var output = titleService.titles;
-      #expect(output).toEqual({ title:'title', subtitle:'subtitle', pageTitle:'pageTitle', pageSubtitle:'pageSubtitle' });
-    #});
-#
-  #});
-#}());
+describe 'UserService', ->
+  userService = httpBackend = null
+  beforeEach module 'User'
+  beforeEach module 'ngResource'
+  
+  beforeEach inject (_userService_, $httpBackend) ->
+      userService = _userService_
+      httpBackend = $httpBackend
 
-describe 'tests', ->
-  messageService= null
-  beforeEach ->
-    angular.module 'app'
-  beforeEach inject ->
-    $injector = angular.injector ['ngMock', 'ng', 'app']
-    messageService = $injector.get 'messageService'
-  it 'should be true', ->
-    expect(true).toBe true
+  it 'should not set the account information if a 403 is returned', (done) ->
+    httpBackend
+    .expectPOST '/api/login'
+    .respond 403
+    
+    userService
+    .login "07754757318", "password"
+    .catch (res) ->
+      expect res
+      .toExist
+      expect userService.currentUser
+      .toBe null
+      done()
+    
+    httpBackend.flush()
+
+  it 'should set the current user if the server returns 200', (done) ->
+    httpBackend
+    .expectPOST '/api/login', {number:"07754757318", pin:"password"}
+    .respond
+      id:2
+      number:"07754757318"
+
+    userService
+    .login "07754757318", "password"
+    .then (res) ->
+      expect res
+      .toEqual id:2, number:"07754757318"
+      
+      expect userService.currentUser
+      .toEqual id:2, number:"07754757318"
+      
+      done()
+
+    httpBackend.flush()
+  
+  it 'should create a new user and return the user details', (done) ->
+    httpBackend
+    .expectPOST '/api/user', {number:"07754757318", pin:"password"}
+    .respond
+      id:2
+      number:"07754757318"
+
+    userService
+    .createUser "07754757318", "password"
+    .then (res) ->
+      expect res
+      .toEqual id:2, number:"07754757318"
+      
+      done()
+
+    httpBackend.flush()
+    
+  it 'should throw if the user was not created', (done) ->
+    httpBackend
+    .expectPOST '/api/user'
+    .respond 403
+
+    userService
+    .createUser "07754757318", "password"
+    .catch ->
+      done()
+
+    httpBackend.flush()
     

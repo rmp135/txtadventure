@@ -9,12 +9,14 @@ internalModules = [
   'Springboard'
   'Terminal'
   'User'
+  'Session'
 ]
 
 externalModules = [
   'ui.router'
   'ngAnimate'
   'ngResource'
+  'ngCookies'
 ]
 
 angular.module module, [] for module in internalModules
@@ -59,11 +61,22 @@ angular.module 'app', externalModules.concat internalModules
       url: '/terminal'
       controller: 'TerminalController'
       templateUrl: '/partials/terminalPartial.html'
-.run ($rootScope, $state, $stateParams) ->
-    $rootScope.$state = $state
-    $rootScope.$stateParams = $stateParams
+.run ($rootScope, $state, $stateParams, sessionService, userService) ->
+  $rootScope.$on "$stateChangeStart", (event) ->
+    if not sessionService.currentSession and next.name isnt 'terminal'
+      event.preventDefault()
+      $state.go 'terminal'
+    
+  if sessionService.currentSession and not userService.currentUser
+    sessionService.getSessionDetails sessionService.currentSession
+    .then (user) ->
+      userService.currentUser = user
+      
+  $rootScope.$state = $state
+  $rootScope.$stateParams = $stateParams
 
 setInterval -> 
+  if document.getElementById 'time'
     date = new Date()
     padTime = (time) -> 
         if time > 9 then time else "0"+time

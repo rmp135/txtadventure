@@ -2,7 +2,7 @@ context = require("../models")
 debug = require("debug") "txtAdventure:sqlService"
 _ = require "lodash"
 Promise = require "bluebird"
-bcyrpt = require 'bcrypt'
+crypto = require 'crypto'
 
 securityService = require '../../../Test/server/services/securityService.js'
 
@@ -24,12 +24,15 @@ internals =
   sessions:
     createSessionForUserId: (userId) ->
       return new Promise (resolve, reject) ->
-        bcyrpt.genSalt 5, (err, salt) ->
-          context.models.Session.create
-            UserId:userId
-            token:salt
-          .then (session) ->
-            resolve id:session.id, token:session.token
+        token = crypto
+        .createHash 'sha256'
+        .update Math.random().toString()
+        .digest 'hex'
+        context.models.Session.create
+          UserId:userId
+          token:token
+        .then (session) ->
+          resolve id:session.id, token:session.token
 
     findByUserId: (userId) ->
       return new Promise (resolve, reject) ->

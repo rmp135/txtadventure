@@ -9,7 +9,7 @@ Joi = require "joi"
 schemas = testRequire 'schemas.js'
 sqlService = testRequire 'services/sqlService.js'
 
-testHelper = localRequire '../tests/testHelper.coffee'
+testHelper = localRequire 'tests/testHelper.coffee'
 
 root = "http://localhost:10000/api"
 
@@ -25,8 +25,23 @@ module.exports = describe 'SessionRoutesTests', ->
         .send {number, pin}
         .endAsync()
       .then (res) ->
-        /^session=.*/.test(res.header['set-cookie']).should.be.true
+        /^session=.*; Path/.test(res.header['set-cookie']).should.be.true
         res.status.should.equal 200
+        done()
+
+    it 'should send the user information back to the client when the user logs in', (done) ->
+      number = testHelper.genNumber()
+      pin = testHelper.genPassword()
+      testHelper.createAccount number, pin
+      .then (user) ->
+        request root
+        .post '/login'
+        .send {number, pin}
+        .endAsync()
+      .then (res) ->
+        res.status.should.equal 200
+        expect(Joi.validate(res.body, schemas.ContactSchema).error).to.be.null
+        res.body.number.should.equal number
         done()
     
     it 'should persist the session when a user logs in', (done) ->
@@ -130,7 +145,32 @@ module.exports = describe 'SessionRoutesTests', ->
         res.status.should.equal 400
         /^session=.*/.test(res.header['set-cookie']).should.be.false
         done()
-          
+  describe 'Reading', ->
+    it 'should return the user when a valid session is sent', (done) ->
+      testHelper.login()
+      .then (logindetails) ->
+        {user, session} = logindetails
+        console.log session.token
+        request root
+        .get "/session/#{session.token}"
+        .send()
+        .endAsync()
+        .then (res) ->
+          res.status.should.equal 200
+          expect(Joi.validate(res.body, schemas.ContactSchema).error).to.be.null
+          res.body.id.should.equal user.id
+          res.body.number.should.equal user.number
+          done()
+        
+    it 'should return 404 when an invalid session is sent', (done) ->
+      request root
+      .get "/session/notatoken"
+      .send()
+      .endAsync()
+      .then (res) ->
+        res.status.should.equal 404
+        done()
+    
   describe 'Destroying', ->
     it 'should remove all sessions for a user when logging out', (done) ->
       testHelper.createAccount()
@@ -144,7 +184,7 @@ module.exports = describe 'SessionRoutesTests', ->
         .endAsync()
       .then (res) ->
         res.status.should.equal 200
-        /^session=;/.test(res.header['set-cookie']).should.be.true
+        /^session=.*; Path/.test(res.header['set-cookie']).should.be.true
         done()
 
     it 'should return 200 and remove the cookie when the cookie is invalid', (done) ->

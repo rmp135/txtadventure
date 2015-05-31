@@ -44,9 +44,9 @@ app.use (req, res, next) ->
   next err
 
 app.use (err, req, res, next) ->
-  res.status err.status||500
+  res.status err.status
   res.render "error", 
     message: err.message
-    error:{}
+    error: if err.status is 500 then err.stack else if err.status is 400 then JSON.stringify err.errors else err
 
 module.exports = app

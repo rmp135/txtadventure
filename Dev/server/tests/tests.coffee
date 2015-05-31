@@ -1,9 +1,9 @@
 global.testRequire = (name) ->
-  require "../../Test/server/#{name}"
+  require "../../../Test/server/#{name}"
   
 server = require('http').createServer(testRequire('../app.js'))
 global.localRequire = (name) ->
-  require "../serverassets/#{name}"
+  require "../#{name}"
 fs = require 'fs'
 
 context = testRequire 'models'

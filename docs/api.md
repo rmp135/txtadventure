@@ -1,5 +1,53 @@
 # TxtAdventure API
 
+## /number
+### GET
+
+Requests a new number and pin code to be generated and returned. 
+
+#### Request Body
+
+    {id, number, pin}
+
+
+## /login
+#### POST
+
+Logs a user in, setting a session cookie of the user and returning the user details.
+
+#### Request Body
+
+    {number, pin}
+
+#### Response Body
+
+    {id, number}
+
+#### Response Cookies
+
+    session
+
+#### Response Codes
+
+`400 - Number missing.`
+
+`400 - Pin missing.`
+
+`401 - Authentication failed`
+
+## /session/:token
+### GET
+
+Retrieves the user details for the session `token`. If the cookie does not exist or no session exists, a 404 is returned.
+
+#### Response Body
+
+    {id, number, pin}
+
+#### Response Codes
+
+`404 - Session not found.`
+
 ## /user
 ### POST
 

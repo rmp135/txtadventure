@@ -8,7 +8,7 @@ Joi = require "joi"
 
 schemas = testRequire 'schemas.js'
 sqlService = testRequire 'services/sqlService.js'
-testHelper = localRequire '../tests/testHelper.coffee'
+testHelper = localRequire 'tests/testHelper.coffee'
 
 root = "http://localhost:10000/api"
 

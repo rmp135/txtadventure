@@ -6,7 +6,7 @@ Promise = require 'bluebird'
 request = require "supertest"
 Joi = require "joi"
 
-testHelper = localRequire '../tests/testHelper.coffee'
+testHelper = localRequire 'tests/testHelper.coffee'
 schemas = testRequire 'schemas.js'
 sqlService = testRequire 'services/sqlService.js'
 securityService = testRequire 'services/securityService.js'
@@ -64,12 +64,14 @@ module.exports = describe 'UserRoutesTests', ->
         done()
     
     it 'should allow adding a user correctly', (done) ->
+      user = number:"07782738273", pin:"09334"
       request root
       .post '/user'
-      .send number:"07782738273", pin:"09334"
+      .send user
       .endAsync()
       .then (res) ->
         res.status.should.equal 200
+        res.body.number.should.equal user.number
         expect(Joi.validate(res.body, schemas.ContactSchema).error).to.be.null
         done()
   

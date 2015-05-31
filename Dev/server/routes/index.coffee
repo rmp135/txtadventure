@@ -37,7 +37,6 @@ router.use (req, res, next) ->
   debug "Request: #{JSON.stringify req.body}"
   next()
 
-
 router.use '/', sessionRoutes
 router.use '/user', userRoutes
 

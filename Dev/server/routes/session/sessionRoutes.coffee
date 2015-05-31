@@ -8,6 +8,12 @@ schemas = localRequire 'schemas.js'
 sqlService = localRequire 'services/sqlService.js'
 
 
+router.get '/session/:token', (req, res) ->
+  sqlService.accounts.findBySessionToken req.params.token
+  .then (user) ->
+    if not user then return res.sendStatus 404
+    res.json user
+
 router.post '/login', validate(body:schemas.UserCreateSchema), (req, res) ->
   sqlService.accounts.isAuthed req.body.number, req.body.pin
   .then (authed) ->
@@ -17,7 +23,7 @@ router.post '/login', validate(body:schemas.UserCreateSchema), (req, res) ->
       sqlService.sessions.createSessionForUserId user.id
       .then (session) ->
         res.cookie 'session', session.token
-        res.sendStatus 200
+        res.json user
 
 router.post '/logout', (req, res) ->
   res.clearCookie 'session', path:'/'

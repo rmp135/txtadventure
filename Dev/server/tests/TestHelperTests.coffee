@@ -1,7 +1,7 @@
 Promise = require 'bluebird'
 request = require 'supertest'
 
-sqlService = require '../serverassets/services/sqlService.coffee'
+sqlService = require '../services/sqlService.coffee'
 testHelper = require './testHelper.coffee'
 
 describe 'TestHelper', ->
