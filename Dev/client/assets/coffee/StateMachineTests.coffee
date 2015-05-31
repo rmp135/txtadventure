@@ -60,3 +60,10 @@ describe 'StateMachineTests', ->
     machine.transitionToState 'state1'
     machine.performAction 'action'
     expect(toCall).toHaveBeenCalled()
+
+  it 'should pass the action name to otherwise', ->
+    machine.state 'state1'
+    .state 'otherwise', (actionName) ->
+      expect actionName
+      .toEqual 'action'
+    machine.performAction 'action'
