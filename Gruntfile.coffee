@@ -125,15 +125,33 @@ module.exports = (grunt) ->
         client:
           files:"Prod/client/js/app.js":["Prod/client/js/app.js"]
     watch:
-      build:
-        files: ["./Dev/**/*.*"]
-        tasks:['build']
+      client:
+        files: ["./Dev/client/**/*.coffee"]
+        tasks:['coffee:client']
+        options:
+          atBegin:true
+      clientJade:
+        files: ["./Dev/client/app/**/*.jade"]
+        tasks:['jade']
+        options:
+          atBegin:true
+      clientSass:
+        files: ["./Dev/client/app/**/*.scss"]
+        tasks:['sass']
+        options:
+          atBegin:true
+      server:
+        files: ["./Dev/server/**/*.coffee"]
+        tasks:['coffee:server']
         options:
           atBegin:true
       test:
         files: 'test.coffee'
         tasks:['coffee:test']
       clientTests:
-        files: ['./Dev/**/*Tests.coffee']
+        files: ['./Dev/client/**/*Tests.coffee']
         tasks:['karma']
+      serverTests:
+        files: ['./Dev/server/**/*Tests.coffee']
+        tasks:['mochaTest']
   )
