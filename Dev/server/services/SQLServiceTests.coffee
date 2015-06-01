@@ -282,9 +282,9 @@ module.exports = describe 'SQLService', ->
             done()
     
     it 'should only show a single message header when multiple are sent', (done) ->
-      Promise.join testHelper.login(), testHelper.login()
-      .then (accountDetails) ->
-        [{user:user1, session:session1}, {user:user2, session:session2}] = accountDetails
+      Promise.join testHelper.createAccount(), testHelper.createAccount()
+      .then (accounts) ->
+        [user1, user2] = accounts
         # Add user2 as a contact to user1 and vis versa.
         Promise.join (sqlService.contacts.addContactNumberToUser user1.id, user2.number), (sqlService.contacts.addContactNumberToUser user2.id, user1.number)
         .then (contacts) ->
@@ -300,3 +300,19 @@ module.exports = describe 'SQLService', ->
         expect conversations[0].LastMessage
         .to.equal 'test2'
         done()
+
+    it 'should show the last message if the contact is not a user', (done) ->
+      testHelper.createAccount()
+      .then (user1) ->
+        sqlService.contacts.addContactNumberToUser user1.id, testHelper.genNumber()
+        .then (contact) ->
+          sqlService.messages.sendMessageToContact user1.id, contact.id, 'message'
+        .then ->
+          sqlService.messages.getConversationsForUser user1.id
+      .then (conversations) ->
+        expect conversations.length
+        .to.equal 1
+        expect conversations[0].LastMessage
+        .to.equal 'message'
+        done()
+        

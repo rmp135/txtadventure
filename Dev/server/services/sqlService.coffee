@@ -169,7 +169,24 @@ sqlService =
   messages:
     getConversationsForUser: (userId) ->
       return new Promise (resolve, reject) ->
-        sqlService.selectFromView 'getConversationHeaders', "UserId = #{userId} GROUP BY ContactId"
+        query = "SELECT id ContactId, number, IFNULL(message, 'No messages.') LastMessage, UserId FROM (
+          	SELECT * FROM Contact c
+          	LEFT OUTER JOIN (
+          			SELECT * FROM (
+          				SELECT m.id MessageId, c.UserId FromUserId, u.id ToUserId, m.Message FROM Message m
+          				JOIN Contact c on c.id = m.ToContactId
+          				LEFT OUTER JOIN User u on u.number = c.number
+          				UNION
+          				SELECT m.id MessageId, u.id FromUserId,  c.UserId ToUserId, m.Message FROM Message m
+          				JOIN Contact c on c.id = m.ToContactId
+          				LEFT OUTER JOIN User u on u.number = c.number
+          			) where FromUserId = #{userId}
+          	)  m on m.ToUserId = u.id
+          	LEFT OUTER JOIN USER u on u.number = c.number
+          	order by MessageId asc
+          ) where UserId  = #{userId} GROUP BY ContactId;"
+        
+        context.query query
         .then (headers) ->
           resolve _.map headers[0], (header) ->
             return {

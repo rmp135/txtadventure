@@ -17,22 +17,3 @@ CREATE VIEW getConversationDetails AS
   JOIN Contact c on c.id = m.ToContactId
   JOIN User fromUser ON fromUser.id = c.UserId
   LEFT OUTER JOIN User u on u.number = c.number;
-
-DROP VIEW IF EXISTS 'getConversationHeaders';
-CREATE VIEW getConversationHeaders AS
-  SELECT id ContactId, number, IFNULL(message, 'No messages.') LastMessage, UserId FROM (
-  	SELECT * FROM Contact c
-  	LEFT OUTER JOIN USER u on u.number = c.number
-  	LEFT OUTER JOIN (
-  			SELECT * FROM (
-  				SELECT m.id MessageId, c.UserId FromUserId, u.id ToUserId, m.Message FROM Message m
-  				JOIN Contact c on c.id = m.ToContactId
-  				LEFT OUTER JOIN User u on u.number = c.number
-  				UNION
-  				SELECT m.id MessageId, u.id FromUserId,  c.UserId ToUserId, m.Message FROM Message m
-  				JOIN Contact c on c.id = m.ToContactId
-  				LEFT OUTER JOIN User u on u.number = c.number
-  			) 
-  	)  m on m.ToUserId = u.id
-  	order by MessageId asc
-  );
