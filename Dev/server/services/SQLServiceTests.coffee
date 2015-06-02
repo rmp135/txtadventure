@@ -315,4 +315,4 @@ module.exports = describe 'SQLService', ->
         expect conversations[0].LastMessage
         .to.equal 'message'
         done()
-        
+  

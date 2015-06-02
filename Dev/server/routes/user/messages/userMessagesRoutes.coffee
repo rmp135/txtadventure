@@ -23,7 +23,15 @@ router.get '/:conid', (req,res) ->
       res.json messages
 
 router.post '/:conid', validate(body:schemas.NewMessageSchema), (req, res) ->
-  sqlService.messages.sendMessageToContact req.params.userid, req.params.conid, req.body.message
+  sqlService.accounts.findById req.params.userid
+  .then (user) ->
+    sqlService.contacts.findById req.params.conid
+    .then (contact) ->
+      sqlService.accounts.findByNumber contact.number
+    .then (contactUser) ->
+      sqlService.contacts.addContactNumberToUser contactUser.id, user.number
+  .then ->
+    sqlService.messages.sendMessageToContact req.params.userid, req.params.conid, req.body.message
   .then ->
       res.sendStatus 200
 

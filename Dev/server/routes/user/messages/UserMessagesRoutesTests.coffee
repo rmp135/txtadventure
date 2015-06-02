@@ -129,7 +129,26 @@ module.exports = describe 'UserMessagesRoutesTests', ->
         .then (res) ->
           res.status.should.equal 400
           done()
-    
+
+    it 'should add the user as a contact to the recipient when a message is sent', (done) ->
+      sqlService.contacts.addContactNumberToUser user.id, user2.number
+      .then (contact) ->
+        request root
+        .post "/user/#{user.id}/messages/#{contact.id}"
+        .setSession session
+        .send message:"test message"
+        .endAsync()
+        .then (res) ->
+          expect res.status
+          .to.equal 200
+          sqlService.contacts.getContactsForUser user2.id
+        .then (contacts) ->
+          expect contacts.length
+          .to.equal 1
+          expect contacts[0].number
+          .to.equal user.number
+          done()
+
   describe 'Reading', ->
     it 'shold show message headers for a user that has contacts', (done) ->
       testHelper.createAccount()
