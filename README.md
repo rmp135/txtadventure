@@ -4,6 +4,10 @@ An experimental project to build a game based entirely on a phone using Angular.
 
 run `npm install` to install dependencies.
 
+Install [Ruby](http://www.ruby-lang.org/en/downloads/) and [Sass](http://sass-lang.com/install). Sorry about that! 
+
+run `npm run build` to build.
+
 run `npm start` to begin the server.
 
 Visit http://localhost:3000/ to begin.
