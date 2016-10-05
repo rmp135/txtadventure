@@ -11,7 +11,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-mocha-test'
 
   grunt.registerTask 'default','watch'
-  grunt.registerTask 'test', ['mochaTest','karma']
+  grunt.registerTask 'test', ['mochaTest']
   grunt.registerTask 'transpile', ['coffee','sass','jade']
   grunt.registerTask 'build', ['clean:build',"copy:devToTest", 'transpile','test']
   #grunt.registerTask 'build', ['clean:build',"copy:devToTest", 'transpile']
@@ -126,22 +126,27 @@ module.exports = (grunt) ->
           files:"Prod/client/js/app.js":["Prod/client/js/app.js"]
     watch:
       client:
-        files: ["./Dev/client/**/*.coffee"]
+        files: ["Dev/client/**/*.coffee"]
         tasks:['coffee:client']
         options:
           atBegin:true
       clientJade:
-        files: ["./Dev/client/app/**/*.jade"]
+        files: ["Dev/client/app/**/*.jade"]
         tasks:['jade']
         options:
           atBegin:true
       clientSass:
-        files: ["./Dev/client/app/**/*.scss"]
+        files: ["Dev/client/app/**/*.scss"]
         tasks:['sass']
         options:
+          sourcemap:"none"
           atBegin:true
+      livereload:
+        options:
+          livereload:true
+        files: ["Test/client/**/*", "!Test/client/css/*.map"]
       server:
-        files: ["./Dev/server/**/*.coffee"]
+        files: ["Dev/server/**/*.coffee"]
         tasks:['coffee:server']
         options:
           atBegin:true
@@ -149,9 +154,9 @@ module.exports = (grunt) ->
         files: 'test.coffee'
         tasks:['coffee:test']
       clientTests:
-        files: ['./Dev/client/**/*Tests.coffee']
+        files: ['Dev/client/**/*Tests.coffee']
         tasks:['karma']
       serverTests:
-        files: ['./Dev/server/**/*Tests.coffee']
+        files: ['Dev/server/**/*Tests.coffee']
         tasks:['mochaTest']
   )
