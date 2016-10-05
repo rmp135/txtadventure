@@ -1,0 +1,68 @@
+.listview {
+    background-color:white;
+    // border-radius: 1rem;
+    border: grey 1px solid;
+    list-style-type: none;
+    padding-left:0;
+    // padding-right:1rem;
+    font-family:sans-serif;
+    listcell {
+        border-top: lightgrey 0.1rem solid;
+        padding-right:1rem;
+        padding-left:1rem;
+        // border-bottom: grey 1px solid;
+        padding-top:0.2rem;
+        padding-bottom:0.2rem;
+        display: block;
+        margin-left:0px;
+        border-collapse: collapse;
+        height: 2.25rem;
+        align-items: center;
+        display: flex;
+        transition: 0.1s linear;
+        &.clicked {
+            background:lightgrey;
+        }
+        // position: absolute;
+        &:last-child {
+            border-bottom: none;
+        }
+        &:first-child {
+            border-top:none;
+        }
+        .left, .title {
+            // position: absolute;
+            float:left;
+            // margin-top:1rem;
+        }
+        .left {
+            font-size:1.5rem;
+            width: 2rem;
+            height: 2rem;
+
+            color:white;
+            i {
+                display: flex;
+                align-items: center;
+                width: inherit;
+                height: inherit;
+                background-color:blue;
+                border-radius:25%;
+                &:before {
+                    text-align: center;
+                    display: block;
+                    margin-right:auto;
+                    margin-left:auto;
+                }
+            }
+        }
+        .title {
+            margin-left: 1rem;
+
+        }
+        .right {
+            color:grey;
+            margin-left: auto;
+        }
+    }
+}

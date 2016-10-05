@@ -1,0 +1,39 @@
+.switch {
+    width:4rem;
+    height: 2rem;
+    border-radius:50%;
+    &.enabled {
+        .background {
+           background: green;
+        }
+        .background {
+            box-shadow:inset darkgreen 0 -0.05rem 0.1rem;
+        }
+        .rocker {
+            margin-left:2rem;
+        }
+    }
+    .background {
+        transition: 0.4s linear;
+        box-shadow:inset darkgrey 0 -0.05rem 0.1rem;
+    }
+    .background, .rocker {
+        background: grey;
+        position: absolute;
+        height: inherit;
+        width: inherit;
+        border-radius:3rem;
+    }
+    .rocker {
+        border:grey 0.1rem solid;
+        box-sizing:border-box;
+        background: white;
+        border-radius: 50%;
+        width: 2rem;
+        height: inherit;
+        transition: 0.4s, linear, ease-out;
+        -webkit-transition: 0.4s, linear, ease-out;
+        margin-left: 0rem;
+        box-shadow:grey 0px 0.05rem 0.15rem;
+    }
+}

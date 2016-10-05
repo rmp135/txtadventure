@@ -1,10 +1,12 @@
-@import 'ContactList/contactListStyle';
-@import 'Phone/phoneStyle';
-@import 'Device/deviceStyle';
-@import 'Springboard/springboardStyle';
-@import 'MessageList/messageListStyle';
-@import 'MessageDetail/messageDetailStyle';
-@import 'Terminal/terminalStyle';
+@import "ContactList/contactListStyle";
+@import "Phone/phoneStyle";
+@import "Device/deviceStyle";
+@import "Springboard/springboardStyle";
+@import "MessageList/messageListStyle";
+@import "MessageDetail/messageDetailStyle";
+@import "Terminal/terminalStyle";
+@import "Settings/settingsStyle";
+@import "UI/uiStyle";
 
 * {
     margin: 0;

@@ -1,0 +1,31 @@
+div#navbar
+  div.navsection
+    a(ui-sref='springboard')
+      i.fa.fa-arrow-left
+  div.navsection.aligncenter
+    span Settings
+  div.navsection
+div#settingsview.content-view
+    ul.listview
+      listcell(click="test")
+        .left
+          i.fa.fa-plane(style="background-color:orange")
+        .title Airplane Mode
+        switch.right
+      listcell
+        .left
+          i.fa.fa-wifi
+        .title Wi-Fi
+        switch.right
+      listcell
+        .left
+        .title Number
+        .right 07754757318
+    ul.listview
+      listcell
+        .left
+          i.fa.fa-plane
+        .title Airplane Mode
+        switch.right
+      listcell
+        .left

@@ -13,5 +13,5 @@ angular.module 'User'
     .$promise
     .then (res) ->
       id:res.id, number:res.number
-      
+
   return userService
