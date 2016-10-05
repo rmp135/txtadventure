@@ -3,3 +3,7 @@ npm-debug.log
 Prod/*
 Test/*
 db.sqlite3
+*.DS_Store
+.sass-cache
+node_modules
+
